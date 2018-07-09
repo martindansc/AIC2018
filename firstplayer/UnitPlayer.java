@@ -62,7 +62,7 @@ public class UnitPlayer {
 
     // End getters and setters
 
-    // Higher level functions
+    // Higher level functions for the map tree
     private void buildNode(UnitController uc) {
         // set children to null
         setRightNode(uc, node, NULL_NODE);
@@ -81,7 +81,6 @@ public class UnitPlayer {
     private void insertNode(UnitController uc) {
 
         if(node == NULL_NODE) {
-            //System.out.println("Trying to insert a node that is already inserted!");
             return;
         }
 
@@ -93,7 +92,6 @@ public class UnitPlayer {
         }
 
         if(node == NULL_NODE) {
-            //System.out.println("We are screwed, there is no space left for inserting the node");
             return;
         }
 
