@@ -17,7 +17,7 @@ public class UnitPlayer {
 
     private void resetTree(UnitController uc) {
 
-        for(int i = 1; i < NODE_MAX_SPACE; i += NODE_SPACE) {
+        for(int i = 1; i < NODE_MAX_SPACE; i += 1) {
             uc.write(i, NULL_NODE);
         }
 
@@ -80,10 +80,6 @@ public class UnitPlayer {
 
     private void insertNode(UnitController uc) {
 
-        if(node == NULL_NODE) {
-            return;
-        }
-
         for(int i = 1; i < NODE_MAX_SPACE; i += NODE_SPACE) {
             if(uc.read(i) == NULL_NODE) {
                 node = i;
@@ -134,10 +130,9 @@ public class UnitPlayer {
 	    Direction[] dirs = Direction.values();
 
 	    //build root node if we are the first unit
-        // yeh, I know, the second unit will rebuild the tree too
         int root = getRootNode(uc);
-        if(getLeftNode(uc, root) == NULL_NODE &&
-                getRightNode(uc, root) == NULL_NODE) resetTree(uc);
+        if(getLeftNode(uc, root) == 0 &&
+                getRightNode(uc, root) == 0) resetTree(uc);
 
 
         //Random number between 0 and 2
@@ -178,6 +173,13 @@ public class UnitPlayer {
                 for (UnitInfo unit : enemies){
                     if (uc.canAttack(unit)) uc.attack(unit);
                 }
+            }
+
+            if(uc.getRound() == 500) {
+                for(int i = 1; i < NODE_MAX_SPACE; i += 1) {
+                    System.out.println(uc.read(i));
+                }
+
             }
 
             uc.yield(); //End of turn
