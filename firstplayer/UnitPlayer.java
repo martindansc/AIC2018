@@ -12,12 +12,12 @@ public class UnitPlayer {
 
     // Tree functions for mapping units
     private int getRootNode(UnitController uc) {
-        return uc.read(0);
+        return 0;
     }
 
     private void resetTree(UnitController uc) {
 
-        for(int i = 1; i < NODE_MAX_SPACE; i += 1) {
+        for(int i = 0; i < NODE_MAX_SPACE; i += 1) {
             uc.write(i, NULL_NODE);
         }
 
@@ -60,10 +60,22 @@ public class UnitPlayer {
         }
     }
 
+    private int getUnitsNode(UnitController uc, int n) {
+        int ret = uc.read(n);
+        if(ret == -1) return 0;
+        return ret;
+    }
+
+    private void setUnitsNode(UnitController uc, int n, int val) {
+        uc.write(n, val);
+    }
+
     // End getters and setters
 
-    // Higher level functions for the map tree
+
     private void buildNode(UnitController uc) {
+        setUnitsNode(uc, node, 1);
+
         // set children to null
         setRightNode(uc, node, NULL_NODE);
         setLeftNode(uc, node, NULL_NODE);
@@ -71,6 +83,7 @@ public class UnitPlayer {
         setAxisAndDicriminator(uc, node, uc.getLocation());
     }
 
+    // Higher level functions for the map tree
     private boolean isNextRight(UnitController uc, int n, Location l) {
         int discr = getAxis(uc, n);
         int num = getDiscriminantNum(uc, n);
@@ -80,7 +93,7 @@ public class UnitPlayer {
 
     private void insertNode(UnitController uc) {
 
-        for(int i = 1; i < NODE_MAX_SPACE; i += NODE_SPACE) {
+        for(int i = 0; i < NODE_MAX_SPACE; i += NODE_SPACE) {
             if(uc.read(i) == NULL_NODE) {
                 node = i;
                 break;
@@ -121,6 +134,14 @@ public class UnitPlayer {
 
     }
 
+    private void updateNode(UnitController uc) {
+
+        // update the number of units that you have, this is just an example
+        int num = getUnitsNode(uc, getLeftNode(uc, node)) +
+                getUnitsNode(uc, getRightNode(uc, node));
+        setUnitsNode(uc, node, num);
+    }
+
     // Run function
     public void run(UnitController uc) {
 	    //opponent team
@@ -146,6 +167,9 @@ public class UnitPlayer {
             if(node == NULL_NODE) {
                 insertNode(uc);
             }
+
+            // update the node
+            updateNode(uc);
 
             //If worker do a barracks
             if (uc.getType() == UnitType.WORKER){
@@ -173,13 +197,6 @@ public class UnitPlayer {
                 for (UnitInfo unit : enemies){
                     if (uc.canAttack(unit)) uc.attack(unit);
                 }
-            }
-
-            if(uc.getRound() == 500) {
-                for(int i = 1; i < NODE_MAX_SPACE; i += 1) {
-                    System.out.println(uc.read(i));
-                }
-
             }
 
             uc.yield(); //End of turn
