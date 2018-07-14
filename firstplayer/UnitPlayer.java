@@ -1,149 +1,15 @@
 package firstplayer;
 
 import aic2018.*;
+import player.TreeAnalysis;
 
 public class UnitPlayer {
 
-    int NODE_SPACE = 5;
-    int NODE_MAX_SPACE = 1000 * NODE_SPACE;
-    int NULL_NODE = -1;
-
-    int node = NULL_NODE;
-
-    // Tree functions for mapping units
-    private int getRootNode(UnitController uc) {
-        return 0;
-    }
-
-    private void resetTree(UnitController uc) {
-
-        for(int i = 0; i < NODE_MAX_SPACE; i += 1) {
-            uc.write(i, NULL_NODE);
-        }
-
-    }
-
-    private int getRightNode(UnitController uc, int n) {
-        return uc.read(n + 1);
-    }
-
-    private void setRightNode(UnitController uc, int n, int val) {
-        uc.write(n + 1, val);
-    }
-
-    private int getLeftNode(UnitController uc, int n) {
-        return uc.read(n + 2);
-    }
-
-    private void setLeftNode(UnitController uc, int n, int val) {
-        uc.write(n + 2, val);
-    }
-
-    // This and the next could be optimized to use only one int
-    private int getAxis(UnitController uc, int n) {
-        return uc.read(n + 3);
-    }
-
-    private int getDiscriminantNum(UnitController uc, int n) {
-        return uc.read(n + 4);
-    }
-
-    private void setAxisAndDicriminator(UnitController uc, int n, Location l) {
-        double rand = Math.random();
-        if(rand < 0.5) {
-            uc.write(node + 3, -1);
-            uc.write(node + 4, l.x);
-        }
-        else {
-            uc.write(node + 3, 1);
-            uc.write(node + 4, l.y);
-        }
-    }
-
-    private int getUnitsNode(UnitController uc, int n) {
-        int ret = uc.read(n);
-        if(ret == -1) return 0;
-        return ret;
-    }
-
-    private void setUnitsNode(UnitController uc, int n, int val) {
-        uc.write(n, val);
-    }
-
-    // End getters and setters
-
-
-    private void buildNode(UnitController uc) {
-        setUnitsNode(uc, node, 1);
-
-        // set children to null
-        setRightNode(uc, node, NULL_NODE);
-        setLeftNode(uc, node, NULL_NODE);
-
-        setAxisAndDicriminator(uc, node, uc.getLocation());
-    }
-
-    // Higher level functions for the map tree
-    private boolean isNextRight(UnitController uc, int n, Location l) {
-        int discr = getAxis(uc, n);
-        int num = getDiscriminantNum(uc, n);
-
-        return ((discr < 0 && num < l.x) || (discr > 0 && num < l.y));
-    }
-
-    private void insertNode(UnitController uc) {
-
-        for(int i = 0; i < NODE_MAX_SPACE; i += NODE_SPACE) {
-            if(uc.read(i) == NULL_NODE) {
-                node = i;
-                break;
-            }
-        }
-
-        if(node == NULL_NODE) {
-            return;
-        }
-
-        // search for a place and build node
-        Location l = uc.getLocation();
-        int current_node = getRootNode(uc);
-        while(true) {
-            boolean is_next_right = isNextRight(uc, current_node, l);
-            int next_node;
-            if(is_next_right) {
-                next_node = getRightNode(uc, current_node);
-            }
-            else {
-                next_node = getLeftNode(uc, current_node);
-            }
-
-            if(next_node == NULL_NODE) {
-                if(is_next_right) {
-                    setRightNode(uc, current_node, node);
-                }
-                else {
-                    setLeftNode(uc, current_node, node);
-                }
-
-                buildNode(uc);
-                break;
-            }
-
-            current_node = next_node;
-        }
-
-    }
-
-    private void updateNode(UnitController uc) {
-
-        // update the number of units that you have, this is just an example
-        int num = getUnitsNode(uc, getLeftNode(uc, node)) +
-                getUnitsNode(uc, getRightNode(uc, node));
-        setUnitsNode(uc, node, num);
-    }
-
     // Run function
     public void run(UnitController uc) {
+
+        TreeAnalysis tAnalysys = new TreeAnalysis();
+
 	    //opponent team
 	    Team opponent = uc.getOpponent();
 
@@ -151,9 +17,9 @@ public class UnitPlayer {
 	    Direction[] dirs = Direction.values();
 
 	    //build root node if we are the first unit
-        int root = getRootNode(uc);
-        if(getLeftNode(uc, root) == 0 &&
-                getRightNode(uc, root) == 0) resetTree(uc);
+        int root = tAnalysys.getRootNode();
+        if(tAnalysys.getLeftNode(uc, root) == 0 &&
+                tAnalysys.getRightNode(uc, root) == 0) tAnalysys.resetTree(uc);
 
 
         //Random number between 0 and 2
@@ -162,14 +28,15 @@ public class UnitPlayer {
         while (true) {
 
             // maybe we should reset the tree, when? unknown at the moment
+            tAnalysys.resetTree(uc);
 
             // insert the node if needed
-            if(node == NULL_NODE) {
-                insertNode(uc);
+            if(tAnalysys.node == tAnalysys.NULL_NODE) {
+                tAnalysys.insertNode(uc);
             }
 
             // update the node
-            updateNode(uc);
+            tAnalysys.updateNode(uc);
 
             //If worker do a barracks
             if (uc.getType() == UnitType.WORKER){
