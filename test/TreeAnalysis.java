@@ -1,4 +1,4 @@
-package player;
+package test;
 
 import aic2018.Location;
 import aic2018.UnitController;

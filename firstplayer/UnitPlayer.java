@@ -16,11 +16,12 @@ public class UnitPlayer {
 	    //all directions
 	    Direction[] dirs = Direction.values();
 
+        tAnalysys.resetTree(uc);
+
 	    //build root node if we are the first unit
         int root = tAnalysys.getRootNode();
         if(tAnalysys.getLeftNode(uc, root) == 0 &&
                 tAnalysys.getRightNode(uc, root) == 0) tAnalysys.resetTree(uc);
-
 
         //Random number between 0 and 2
         int typeIndex = (int)(Math.random()*3);
@@ -28,7 +29,6 @@ public class UnitPlayer {
         while (true) {
 
             // maybe we should reset the tree, when? unknown at the moment
-            tAnalysys.resetTree(uc);
 
             // insert the node if needed
             if(tAnalysys.node == tAnalysys.NULL_NODE) {

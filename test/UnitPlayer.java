@@ -1,4 +1,4 @@
-package workers;
+package test;
 
 import aic2018.*;
 
@@ -58,7 +58,9 @@ public class UnitPlayer {
                     if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
                         if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == opponent)) {
                             uc.attack(newTree);
-                            //uc.move(myLocation.directionTo(locs[i]));
+                            if(uc.isAccessible(locs[i])) {
+                                uc.move(myLocation.directionTo(locs[i]));
+                            }
                         }
                     }
                     if (uc.canSpawn(dirs[i], UnitType.WORKER) && workerCount == 0 && treeCount > 5) {
@@ -95,22 +97,6 @@ public class UnitPlayer {
                 for (UnitInfo unit : enemies){
                     if (uc.canAttack(unit)) uc.attack(unit);
                 }
-            }
-
-            // Move
-            float bestValue = collect.evalLocation(uc, myLocation);
-			Location bestLocation = myLocation;
-
-			List<Location> posibleMoves = utils.getPosibleMoves(uc);
-            for (Location posibleMove : posibleMoves) {
-                float newValue = collect.evalLocation(uc, posibleMove);
-                if(newValue >= bestValue) {
-                    bestLocation = posibleMove;
-                    bestValue = newValue;
-                }
-            }
-            if(bestLocation != myLocation) {
-                uc.move(myLocation.directionTo(bestLocation));
             }
 
             uc.yield(); //End of turn
