@@ -133,7 +133,6 @@ public class TreeAnalysis {
     }
 
     public void updateNode(UnitController uc) {
-
         // update the number of units that you have, this is just an example
         int num = getUnitsNode(uc, getLeftNode(uc, node)) +
                 getUnitsNode(uc, getRightNode(uc, node)) + 1;
