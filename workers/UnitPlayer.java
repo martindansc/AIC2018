@@ -6,13 +6,13 @@ public class UnitPlayer {
     public void run(UnitController uc) {
         Utils utils = new Utils();
         Collect collect = new Collect();
-        MemoryManager memoryManager = new MemoryManager(uc);
+        Attack attack = new Attack();
 
 	    /*Insert here the code that should be executed only at the beginning of the unit's lifespan*/
 
 	    //opponent team
-        Team opponent = memoryManager.opponent;
-        Team allies = memoryManager.allies;
+        Team opponent = uc.getOpponent();
+        Team allies = uc.getTeam();
 
         //all directions
         Direction[] dirs = Direction.values();
@@ -22,7 +22,7 @@ public class UnitPlayer {
 
         while (true) {
 
-            memoryManager.update();
+            //memoryManager.update();
 
             utils.buyPointsIfNeeded(uc);
             utils.pickVictoryPoints(uc);
@@ -51,6 +51,7 @@ public class UnitPlayer {
                         }
                     }
                 }
+
                 UnitInfo[] units = uc.senseUnits();
                 for (int i = 0; i < locs.length; i++) {
                     int workerCount = 0;
@@ -67,11 +68,17 @@ public class UnitPlayer {
                         }
                     }
                     if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
-                        if (((treeCount == 8 && workerCount < 4) || (treeCount == 7 && workerCount < 2)) && (resources > 199 && round < 100) || (resources > 699 && round > 99)) {
+                        if (((treeCount >= 8 && workerCount < 5) || resources > 700) && ((resources > 199 && round < 100) || (resources > 699 && round > 99))) {
                             uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
                             break;
                         }
                     }
+                }
+
+                // Move worker
+                Location newLoc = collect.evalLocation(uc, myLocation);
+                if (newLoc != myLocation) {
+                    uc.move(myLocation.directionTo(newLoc));
                 }
             }
 
@@ -86,23 +93,13 @@ public class UnitPlayer {
 			        typeIndex = (int)(Math.random()*3);
                 }
             } else{
-			    //If not a barracks or worker move in a random direction and attack the first thing you see
-
-                //Generate a random number between 0 and 7 and move in the associated direction
-                int dirIndex = (int)(Math.random()*8);
-                if (uc.canMove(dirs[dirIndex])) uc.move(dirs[dirIndex]);
-
-                //Attack the first target you see
-                UnitInfo[] enemies = uc.senseUnits(opponent);
-                for (UnitInfo unit : enemies){
-                    if (uc.canAttack(unit)) uc.attack(unit);
+                Location newLoc = attack.evalLocation(uc, myLocation);
+                if (newLoc != myLocation) {
+                    uc.move(myLocation.directionTo(newLoc));
                 }
-            }
 
-            // Move
-            Location newLoc = collect.evalLocation(uc, myLocation);
-            if (newLoc != myLocation) {
-                uc.move(myLocation.directionTo(newLoc));
+                //Attack the lowest target you see
+                attack.attackBestUnit(uc);
             }
 
             uc.yield(); //End of turn
