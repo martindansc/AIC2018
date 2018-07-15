@@ -1,12 +1,9 @@
 package workers;
 import aic2018.*;
 
-import java.util.List;
-
 public class UnitPlayer {
 
     public void run(UnitController uc) {
-
         Utils utils = new Utils();
         Collect collect = new Collect();
 
@@ -28,50 +25,42 @@ public class UnitPlayer {
 
             Location myLocation = uc.getLocation();
 
-            Location[] locs = new Location[8];
-
-			if (uc.getType() == UnitType.WORKER){
+            if (uc.getType() == UnitType.WORKER){
+                Location locs[] = utils.getLocations(uc, myLocation);
                 int treeCount = 0;
-                int workerCount = 0;
-                int index = 0;
-                for (int i = -1; i < 2; i++) {
-                    for (int j = -1; j < 2; j++) {
-                        if (i != 0 || j != 0) {
-                            locs[index] = new Location(myLocation.x + i, myLocation.y + j);
-                            TreeInfo newTree = uc.senseTree(locs[index]);
-                            UnitInfo newUnit = uc.senseUnit(locs[index]);
-                            if (uc.isOutOfMap(locs[index]) || (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12))) {
-                                treeCount++;
-                            }
-                            if (newUnit != null && newUnit.getTeam() != opponent && newUnit.getType() == UnitType.WORKER) {
-                                workerCount++;
-                            }
-                            index++;
-                        }
+
+                for (int i = 0; i < locs.length; i++) {
+                    TreeInfo newTree = uc.senseTree(locs[i]);
+                    if (newTree != null && newTree.remainingGrowthTurns == 0 && newTree.health > 12) {
+                        treeCount++;
                     }
                 }
-
-                for (int i = 0; i < 8; i++) {
-                    TreeInfo newTree = uc.senseTree(locs[i]);
-                    UnitInfo newUnit = uc.senseUnit((locs[i]));
-                    if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
-                        if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == opponent)) {
-                            uc.attack(newTree);
-                            //uc.move(myLocation.directionTo(locs[i]));
+                for (int i = 0; i < locs.length; i++) {
+                    int workerCount = 0;
+                    UnitInfo[] units = uc.senseUnits(allies);
+                    for (int j = 0; j < units.length; j++) {
+                        if (units[j].getType() == UnitType.WORKER) {
+                            workerCount++;
                         }
                     }
-                    if (uc.canSpawn(dirs[i], UnitType.WORKER) && workerCount == 0 && treeCount > 5) {
-                        uc.spawn(dirs[i], UnitType.WORKER);
-                        break;
+                    if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER) && workerCount < 2 && treeCount > 3) {
+                        uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
                     }
                     if (uc.canUseActiveAbility(locs[i])) {
                         uc.useActiveAbility(locs[i]);
-                        break;
+                    }
+                    TreeInfo newTree = uc.senseTree(locs[i]);
+                    UnitInfo newUnit = uc.senseUnit(locs[i]);
+                    if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
+                        if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == opponent)) {
+                            uc.attack(newTree);
+                        }
                     }
                 }
 
-				//for (int i = 0; i < 8; ++i) if (uc.canSpawn(dirs[i], UnitType.BARRACKS)) uc.spawn(dirs[i], UnitType.BARRACKS);
+                //for (int i = 0; i < 8; ++i) if (uc.canSpawn(dirs[i], UnitType.BARRACKS)) uc.spawn(dirs[i], UnitType.BARRACKS);
             }
+
             //If barracks do a random unit between warrior, archer and knight
             else if (uc.getType() == UnitType.BARRACKS){
 			    //Getting the type associated to typeIndex
@@ -100,17 +89,17 @@ public class UnitPlayer {
             float bestValue = collect.evalLocation(uc, myLocation);
 			Location bestLocation = myLocation;
 
-			/*List<Location> posibleMoves = utils.getPosibleMoves(uc);
-            for (Location posibleMove : posibleMoves) {
-                float newValue = collect.evalLocation(uc, posibleMove);
+			Location possibleMoves[] = utils.getPosibleMoves(uc);
+            for (int i = 0; i < possibleMoves.length; i++) {
+                float newValue = collect.evalLocation(uc, possibleMoves[i]);
                 if(newValue >= bestValue) {
-                    bestLocation = posibleMove;
+                    bestLocation = possibleMoves[i];
                     bestValue = newValue;
                 }
             }
             if(bestLocation != myLocation) {
                 uc.move(myLocation.directionTo(bestLocation));
-            }*/
+            }
 
             uc.yield(); //End of turn
         }
