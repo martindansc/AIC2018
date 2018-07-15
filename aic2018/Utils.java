@@ -1,9 +1,9 @@
 package aic2018;
 
-import aic2018.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import aic2018.Direction;
+import aic2018.GameConstants;
+import aic2018.Location;
+import aic2018.UnitController;
 
 public class Utils {
     public void buyPointsIfNeeded(UnitController uc) {
@@ -19,29 +19,54 @@ public class Utils {
 
     public void pickVictoryPoints(UnitController uc) {
         Direction[] dirs = Direction.values();
-        for(int i = 0; i < dirs.length; i++) {
+        for(int i = 0; i < 8; i++) {
             if(uc.canGatherVPs(dirs[i])) {
                 uc.gatherVPs(dirs[i]);
             }
         }
     }
 
-    public List<Location> getPosibleMoves(UnitController uc) {
-        List<Location> locs = new ArrayList<>();
+    public Location[] getPosibleMoves(UnitController uc) {
 
+        if (!uc.canMove()) {
+            Location locs[] = new Location[0];
+            return locs;
+        }
+
+        Location locs[] = new Location[8];
         Location myLocation = uc.getLocation();
         Direction[] dirs = Direction.values();
-        for(int i = 0; i < dirs.length; i++) {
+        int possibilities = 0;
+
+        for(int i = 0; i < 8; i++) {
             Location next = myLocation.add(dirs[i]);
             if(uc.isAccessible(next)) {
-                locs.add(next);
+                locs[i] = next;
+                possibilities++;
             }
         }
 
-        return locs;
+        Location realLocs[] = new Location[possibilities];
+        int counter = 0;
+        for (int i = 0; i < 8; i++) {
+            if (locs[i] != null) {
+                realLocs[i - counter] = locs[i];
+            } else {
+                counter++;
+            }
+        }
+
+        return realLocs;
     }
 
-    public void test(UnitController uc) {
-        uc.println("This have been printed from aic2018 package");
+    public Location[] getLocations(UnitController uc, Location loc) {
+        Location locs[] = new Location[8];
+
+        Direction[] dirs = Direction.values();
+        for(int i = 0; i < 8; i++) {
+            locs[i] = (loc.add(dirs[i]));
+        }
+
+        return locs;
     }
 }

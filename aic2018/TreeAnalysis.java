@@ -1,8 +1,5 @@
 package aic2018;
 
-import aic2018.Location;
-import aic2018.UnitController;
-
 public class TreeAnalysis {
 
     public int NODE_SPACE = 5;

@@ -1,13 +1,19 @@
 package aic2018;
 
-import aic2018.*;
-
 public class Collect {
+
+    Utils utils = new Utils();
 
     public float evalLocation(UnitController uc, Location loc) {
         Team allies = uc.getTeam();
-
         float value = 0;
+
+        Location locs[] = utils.getLocations(uc, loc);
+        for (int i = 0; i < locs.length; i++) {
+            if (uc.isOutOfMap(locs[i])) {
+                return Float.NEGATIVE_INFINITY;
+            }
+        }
 
         TreeInfo[] trees = uc.senseTrees();
         for(int i = 0; i < trees.length; i++) {
@@ -36,7 +42,6 @@ public class Collect {
                 value -= 60000/(10 + distance);
             }
         }
-
         return value;
 
     }
