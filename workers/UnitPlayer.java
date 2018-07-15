@@ -1,5 +1,4 @@
 package workers;
-
 import aic2018.*;
 
 import java.util.List;
@@ -101,7 +100,7 @@ public class UnitPlayer {
             float bestValue = collect.evalLocation(uc, myLocation);
 			Location bestLocation = myLocation;
 
-			List<Location> posibleMoves = utils.getPosibleMoves(uc);
+			/*List<Location> posibleMoves = utils.getPosibleMoves(uc);
             for (Location posibleMove : posibleMoves) {
                 float newValue = collect.evalLocation(uc, posibleMove);
                 if(newValue >= bestValue) {
@@ -111,7 +110,7 @@ public class UnitPlayer {
             }
             if(bestLocation != myLocation) {
                 uc.move(myLocation.directionTo(bestLocation));
-            }
+            }*/
 
             uc.yield(); //End of turn
         }

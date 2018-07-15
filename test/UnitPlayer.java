@@ -2,8 +2,6 @@ package test;
 
 import aic2018.*;
 
-import java.util.List;
-
 public class UnitPlayer {
 
     public void run(UnitController uc) {

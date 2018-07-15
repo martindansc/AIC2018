@@ -1,7 +1,7 @@
 package firstplayer;
 
 import aic2018.*;
-import player.TreeAnalysis;
+import aic2018.TreeAnalysis;
 
 public class UnitPlayer {
 

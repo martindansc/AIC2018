@@ -1,4 +1,4 @@
-package test;
+package aic2018;
 
 import aic2018.*;
 

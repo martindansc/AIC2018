@@ -1,9 +1,6 @@
-package test;
+package aic2018;
 
-import aic2018.Direction;
-import aic2018.GameConstants;
-import aic2018.Location;
-import aic2018.UnitController;
+import aic2018.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,5 +39,9 @@ public class Utils {
         }
 
         return locs;
+    }
+
+    public void test(UnitController uc) {
+        uc.println("This have been printed from aic2018 package");
     }
 }
