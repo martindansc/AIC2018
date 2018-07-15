@@ -6,12 +6,13 @@ public class UnitPlayer {
     public void run(UnitController uc) {
         Utils utils = new Utils();
         Collect collect = new Collect();
+        MemoryManager memoryManager = new MemoryManager(uc);
 
 	    /*Insert here the code that should be executed only at the beginning of the unit's lifespan*/
 
 	    //opponent team
-        Team opponent = uc.getOpponent();
-        Team allies = uc.getTeam();
+        Team opponent = memoryManager.opponent;
+        Team allies = memoryManager.allies;
 
         //all directions
         Direction[] dirs = Direction.values();
@@ -20,6 +21,9 @@ public class UnitPlayer {
 	    int typeIndex = (int)(Math.random()*3);
 
         while (true) {
+
+            memoryManager.update();
+
             utils.buyPointsIfNeeded(uc);
             utils.pickVictoryPoints(uc);
 
