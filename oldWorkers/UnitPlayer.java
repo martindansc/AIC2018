@@ -1,4 +1,4 @@
-package workers;
+package oldWorkers;
 import aic2018.*;
 
 public class UnitPlayer {
@@ -22,7 +22,7 @@ public class UnitPlayer {
         while (true) {
             utils.buyPointsIfNeeded(uc);
             utils.pickVictoryPoints(uc);
-            int round = uc.getRound();
+
             Location myLocation = uc.getLocation();
 
             if (uc.getType() == UnitType.WORKER){
@@ -30,7 +30,7 @@ public class UnitPlayer {
                 int resources = uc.getResources();
 
                 for (int i = 0; i < locs.length; i++) {
-                    if (uc.canUseActiveAbility(locs[i]) && (round < 100) || (resources > 699 && round > 99)) {
+                    if (uc.canUseActiveAbility(locs[i])) {
                         uc.useActiveAbility(locs[i]);
                     }
                 }
@@ -47,28 +47,23 @@ public class UnitPlayer {
                         }
                     }
                 }
-                UnitInfo[] units = uc.senseUnits();
                 for (int i = 0; i < locs.length; i++) {
                     int workerCount = 0;
+                    UnitInfo[] units = uc.senseUnits(allies);
                     for (int j = 0; j < units.length; j++) {
-                        if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == allies) {
+                        if (units[j].getType() == UnitType.WORKER) {
                             workerCount++;
-                        }
-                        if (units[j].getTeam() == opponent) {
-                            for (int k = 0; k < 8; ++k) {
-                                if (uc.canSpawn(dirs[i], UnitType.BARRACKS)){
-                                    uc.spawn(dirs[i], UnitType.BARRACKS);
-                                }
-                            }
                         }
                     }
                     if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
-                        if (((treeCount == 8 && workerCount < 4) || (treeCount == 7 && workerCount < 2)) && (resources > 199 && round < 100) || (resources > 699 && round > 99)) {
+                        if (((treeCount == 8 && workerCount < 4) || (treeCount < 8 && workerCount < 5)) && resources > 199) {
                             uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
                             break;
                         }
                     }
                 }
+
+                //for (int i = 0; i < 8; ++i) if (uc.canSpawn(dirs[i], UnitType.BARRACKS)) uc.spawn(dirs[i], UnitType.BARRACKS);
             }
 
             //If barracks do a random unit between warrior, archer and knight

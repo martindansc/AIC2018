@@ -1,10 +1,5 @@
 package aic2018;
 
-import aic2018.Direction;
-import aic2018.GameConstants;
-import aic2018.Location;
-import aic2018.UnitController;
-
 public class Utils {
     public void buyPointsIfNeeded(UnitController uc) {
         if (uc.canBuyVP( GameConstants.VICTORY_POINTS_MILESTONE - uc.getTeam().getVictoryPoints())){
@@ -33,22 +28,22 @@ public class Utils {
             return locs;
         }
 
-        Location locs[] = new Location[8];
-        Location myLocation = uc.getLocation();
+        Location locs[] = new Location[9];
+        locs[8] = uc.getLocation();
         Direction[] dirs = Direction.values();
         int possibilities = 0;
 
         for(int i = 0; i < 8; i++) {
-            Location next = myLocation.add(dirs[i]);
+            Location next = locs[8].add(dirs[i]);
             if(uc.isAccessible(next)) {
                 locs[i] = next;
                 possibilities++;
             }
         }
 
-        Location realLocs[] = new Location[possibilities];
+        Location realLocs[] = new Location[possibilities + 1];
         int counter = 0;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 9; i++) {
             if (locs[i] != null) {
                 realLocs[i - counter] = locs[i];
             } else {
