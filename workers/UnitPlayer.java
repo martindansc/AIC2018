@@ -10,11 +10,11 @@ public class UnitPlayer {
 	    /*Insert here the code that should be executed only at the beginning of the unit's lifespan*/
 
 	    //opponent team
-	    Team opponent = uc.getOpponent();
-	    Team allies = uc.getTeam();
+        Team opponent = uc.getOpponent();
+        Team allies = uc.getTeam();
 
-	    //all directions
-	    Direction[] dirs = Direction.values();
+        //all directions
+        Direction[] dirs = Direction.values();
 
 	    //Random number between 0 and 2
 	    int typeIndex = (int)(Math.random()*3);
