@@ -2,8 +2,15 @@ package aic2018;
 
 public class MemoryManager {
 
+    private int AMIROOT = 10;
+
+    private int startLocationsArray = 12;
+    private int endLocationsArray = 1012;
+
     public UnitController uc;
     private int counterMod2;
+
+    public boolean root;
 
     public Team opponent;
     public Team allies;
@@ -20,7 +27,30 @@ public class MemoryManager {
 
     public void update() {
 
-        // check for root
+        // update if I'm root
+        uc.write(AMIROOT + counterMod2, 0);
+        if(uc.read(AMIROOT + 1 - counterMod2) == 0) {
+            root = true;
+            uc.write(AMIROOT + 1 - counterMod2, 1);
+        }
+        else {
+            root = false;
+        }
+
+        if(root) rootUpdate();
+
+        // update location
+        int locationsArray = startLocationsArray;
+        if(counterMod2 == 1) locationsArray = endLocationsArray + 1;
+        for(int i = locationsArray; i <
+                locationsArray + endLocationsArray - startLocationsArray; i += 2) {
+            if(uc.read(i) == 0) {
+                Location loc = uc.getLocation();
+                uc.write(i, loc.x);
+                uc.write(i + 1, loc.y);
+                break;
+            }
+        }
 
         // update num units
         uc.write(counterMod2, uc.read(counterMod2%2) + 1);
@@ -42,5 +72,13 @@ public class MemoryManager {
 
     // PRIVATE
 
+    private void rootUpdate() {
+        int locationsArray = startLocationsArray;
+        if(counterMod2 == 0) locationsArray = endLocationsArray + 1;
+        for(int i = locationsArray; i <
+                locationsArray + endLocationsArray - startLocationsArray; i += 2) {
+            uc.write(i, 0);
+        }
+    }
 
 }
