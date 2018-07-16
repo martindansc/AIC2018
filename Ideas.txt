@@ -15,3 +15,14 @@ Soldier attack logic steps:
 - In case of tie, choose the one with more XP.
 - In case of tie, choose the closest one.
 - In case of tie, random.
+
+Soldiers should:
+- Try to attack
+- Try to move
+- Try to attack
+
+Workers should:
+- Try to harvest (priority: small trees > oaks; high health > low health)
+- Move
+- Try to harvest
+- Plant tree and or spawn worker (preferably in the direction they last moved)
