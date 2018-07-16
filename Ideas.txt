@@ -26,3 +26,6 @@ Workers should:
 - Move
 - Try to harvest
 - Plant tree and or spawn worker (preferably in the direction they last moved)
+
+Other:
+- Improve water vs allied worked gravity ratio
