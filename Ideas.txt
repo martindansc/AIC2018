@@ -1,0 +1,17 @@
+Change worker spawn to spawn if: T/6 > W + 1 (float), where T is the trees that he sees and W are the allied workers that he sees.
+	- Pros:
+	- In case a unit sees a forest it will spawn workers instead of trees
+
+	- Cons:
+	- In a map like chess, a worker can only cut 4-5 trees, so maybe not enough workers will be spawned. This can be fixed with some conditionals.
+
+Soldier attack logic steps:
+- Initialize my dmg according to my level and my active ability
+- Check for unit with highest health that can be killed
+- If the final chosen unit to attack dies also without the active ability, don't use it.
+- In case that there is a tie and the unit can be killed, check for attack cooldown and choose the one that can attack next turn.
+- In case of tie, choose the highest damaging unit.
+- In case of tie, choose the highest max health unit.
+- In case of tie, choose the one with more XP.
+- In case of tie, choose the closest one.
+- In case of tie, random.
