@@ -65,4 +65,24 @@ public class Utils {
         return locs;
     }
 
+    public Boolean isExtreme(UnitController uc, Location loc) {
+        Location[] newPlaces = getLocations(uc, loc);
+        for (int i = 0; i < newPlaces.length; i++) {
+            if (uc.canSenseLocation(newPlaces[i]) && uc.isOutOfMap(newPlaces[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Boolean isWater(UnitController uc, Location loc) {
+        Location[] newPlaces = getLocations(uc, loc);
+        for (int i = 0; i < newPlaces.length; i++) {
+            if (uc.canSenseLocation(newPlaces[i]) && uc.senseWaterAtLocation(newPlaces[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

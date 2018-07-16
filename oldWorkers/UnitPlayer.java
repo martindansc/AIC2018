@@ -4,8 +4,10 @@ import aic2018.*;
 public class UnitPlayer {
 
     public void run(UnitController uc) {
+
+        MemoryManager memoryManager = new MemoryManager(uc);
         Utils utils = new Utils();
-        Collect collect = new Collect();
+        Collect collect = new Collect(memoryManager);
 
 	    /*Insert here the code that should be executed only at the beginning of the unit's lifespan*/
 

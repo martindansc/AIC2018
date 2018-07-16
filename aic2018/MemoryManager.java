@@ -40,7 +40,7 @@ public class MemoryManager {
         if(root) rootUpdate();
 
         // update location
-        int locationsArray = startLocationsArray;
+        /*int locationsArray = startLocationsArray;
         if(counterMod2 == 1) locationsArray = endLocationsArray + 1;
         for(int i = locationsArray; i <
                 locationsArray + endLocationsArray - startLocationsArray; i += 2) {
@@ -50,7 +50,7 @@ public class MemoryManager {
                 uc.write(i + 1, loc.y);
                 break;
             }
-        }
+        }*/
 
         // update num units
         uc.write(counterMod2, uc.read(counterMod2%2) + 1);
@@ -73,12 +73,12 @@ public class MemoryManager {
     // PRIVATE
 
     private void rootUpdate() {
-        int locationsArray = startLocationsArray;
+        /*int locationsArray = startLocationsArray;
         if(counterMod2 == 0) locationsArray = endLocationsArray + 1;
         for(int i = locationsArray; i <
                 locationsArray + endLocationsArray - startLocationsArray; i += 2) {
             uc.write(i, 0);
-        }
+        }*/
     }
 
 }

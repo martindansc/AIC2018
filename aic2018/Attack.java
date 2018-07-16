@@ -2,12 +2,42 @@ package aic2018;
 
 public class Attack {
 
-    Utils utils = new Utils();
+    private MemoryManager manager;
+    private UnitController uc;
+    private Utils utils = new Utils();
 
-    public Location evalLocation(UnitController uc, Location loc) {
+    public Attack(MemoryManager memoryManager) {
+        this.manager = memoryManager;
+        uc = memoryManager.uc;
+    }
 
-        Location locs[] = utils.getPosibleMoves(uc);
-        TreeInfo[] trees = uc.senseTrees();
+    private int round;
+    private Location myLocation;
+    private Location locs[];
+    private int resources;
+
+    public void play() {
+
+        round = uc.getRound();
+        myLocation = uc.getLocation();
+        locs = utils.getLocations(uc, myLocation);
+        resources = uc.getResources();
+
+        boolean attacked = tryAttackBestUnit();
+        move(attacked);
+        tryAttackBestUnit();
+    }
+
+    public void move(boolean attacked) {
+        Location newLoc = evalLocation(myLocation);
+        if (newLoc != myLocation) {
+            uc.move(myLocation.directionTo(newLoc));
+        }
+    }
+
+    public Location evalLocation(Location loc) {
+
+        Location plocs[] = utils.getPosibleMoves(uc);
         UnitInfo[] units = uc.senseUnits();
         VictoryPointsInfo[] points = uc.senseVPs();
         Team allies = uc.getTeam();
@@ -15,12 +45,12 @@ public class Attack {
         float highestValue = -100000;
         Location bestLocation = loc;
 
-        for (int j = 0; j < locs.length; j++) {
+        for (int j = 0; j < plocs.length; j++) {
             float value = 0;
 
             for (int i = 0; i < units.length; i++) {
                 UnitInfo currentUnit = units[i];
-                float distance = locs[j].distanceSquared(currentUnit.getLocation());
+                float distance = plocs[j].distanceSquared(currentUnit.getLocation());
                 Team unitTeam = currentUnit.getTeam();
                 UnitType unitType = currentUnit.getType();
 
@@ -47,21 +77,21 @@ public class Attack {
 
             for (int i = 0; i < points.length; i++) {
                 VictoryPointsInfo currentVP = points[i];
-                float distance = locs[j].distanceSquared(currentVP.getLocation());
+                float distance = plocs[j].distanceSquared(currentVP.getLocation());
                 value += 2 / (1 + distance);
             }
             if (highestValue < value) {
                 highestValue = value;
-                bestLocation = locs[j];
+                bestLocation = plocs[j];
             }
         }
         return bestLocation;
 
     }
 
-    public void attackBestUnit(UnitController uc) {
+    public boolean tryAttackBestUnit() {
         UnitInfo[] enemies = uc.senseUnits(uc.getOpponent());
-        if(enemies.length == 0) return;
+        if(enemies.length == 0) return false;
 
         UnitInfo enemy = enemies[0];
         int maxHealth = 10001;
@@ -73,6 +103,12 @@ public class Attack {
                 enemy = unit;
             }
         }
-        if(maxHealth != 10001) uc.attack(enemy);
+
+        if(maxHealth != 10001) {
+            uc.attack(enemy);
+            return true;
+        }
+
+        return false;
     }
 }

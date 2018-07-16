@@ -4,15 +4,12 @@ import aic2018.*;
 public class UnitPlayer {
 
     public void run(UnitController uc) {
+        MemoryManager memoryManager = new MemoryManager(uc);
+
         Utils utils = new Utils();
-        Collect collect = new Collect();
-        Attack attack = new Attack();
-
-	    /*Insert here the code that should be executed only at the beginning of the unit's lifespan*/
-
-	    //opponent team
-        Team opponent = uc.getOpponent();
-        Team allies = uc.getTeam();
+        Collect collect = new Collect(memoryManager);
+        Attack attack = new Attack(memoryManager);
+        Barracks barracks = new Barracks(memoryManager);
 
         //all directions
         Direction[] dirs = Direction.values();
@@ -22,84 +19,19 @@ public class UnitPlayer {
 
         while (true) {
 
-            //memoryManager.update();
+            memoryManager.update();
 
             utils.buyPointsIfNeeded(uc);
             utils.pickVictoryPoints(uc);
-            int round = uc.getRound();
             Location myLocation = uc.getLocation();
 
             if (uc.getType() == UnitType.WORKER){
-                Location locs[] = utils.getLocations(uc, myLocation);
-                int resources = uc.getResources();
-
-                for (int i = 0; i < locs.length; i++) {
-                    if (uc.canUseActiveAbility(locs[i]) && (round < 100) || (resources > 699 && round > 99)) {
-                        uc.useActiveAbility(locs[i]);
-                    }
-                }
-                int treeCount = 0;
-                for (int i = 0; i < locs.length; i++) {
-                    TreeInfo newTree = uc.senseTree(locs[i]);
-                    UnitInfo newUnit = uc.senseUnit(locs[i]);
-                    if (newTree != null || !uc.isAccessible(locs[i])) {
-                        treeCount++;
-                    }
-                    if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
-                        if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == opponent)) {
-                            uc.attack(newTree);
-                        }
-                    }
-                }
-
-                UnitInfo[] units = uc.senseUnits();
-                for (int i = 0; i < locs.length; i++) {
-                    int workerCount = 0;
-                    for (int j = 0; j < units.length; j++) {
-                        if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == allies) {
-                            workerCount++;
-                        }
-                        if (units[j].getTeam() == opponent) {
-                            for (int k = 0; k < 8; ++k) {
-                                if (uc.canSpawn(dirs[i], UnitType.BARRACKS)){
-                                    uc.spawn(dirs[i], UnitType.BARRACKS);
-                                }
-                            }
-                        }
-                    }
-                    if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
-                        if (((treeCount >= 8 && workerCount < 5) || resources > 700) && ((resources > 199 && round < 100) || (resources > 699 && round > 99))) {
-                            uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
-                            break;
-                        }
-                    }
-                }
-
-                // Move worker
-                Location newLoc = collect.evalLocation(uc, myLocation);
-                if (newLoc != myLocation) {
-                    uc.move(myLocation.directionTo(newLoc));
-                }
+                collect.play();
             }
-
-            //If barracks do a random unit between warrior, archer and knight
             else if (uc.getType() == UnitType.BARRACKS){
-			    //Getting the type associated to typeIndex
-			    UnitType type = UnitType.values()[2+typeIndex];
-
-			    //try to spawn a unit of the given type, if successful reset type.
-			    for (int i = 0; i < 8; ++i) if (uc.canSpawn(dirs[i], type)){
-			        uc.spawn(dirs[i], type);
-			        typeIndex = (int)(Math.random()*3);
-                }
+                barracks.play();
             } else{
-                Location newLoc = attack.evalLocation(uc, myLocation);
-                if (newLoc != myLocation) {
-                    uc.move(myLocation.directionTo(newLoc));
-                }
-
-                //Attack the lowest target you see
-                attack.attackBestUnit(uc);
+                attack.play();
             }
 
             uc.yield(); //End of turn
