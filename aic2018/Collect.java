@@ -57,7 +57,7 @@ public class Collect {
 
     public void plantIfNeeded() {
         for (int i = 0; i < locs.length; i++) {
-            if (uc.canUseActiveAbility(locs[i]) && (round < 100) || (resources > 699 && round > 99)) {
+            if (uc.canUseActiveAbility(locs[i]) && ((round < 100) || (resources > 699 && round > 99))) {
                 uc.useActiveAbility(locs[i]);
             }
         }
@@ -80,7 +80,7 @@ public class Collect {
                 }
             }
             if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
-                if (((treeCount >= 8 && workerCount < 5) || resources > 700) && ((resources > 199 && round < 100) || (resources > 699 && round > 99))) {
+                if ((((treeCount == 8 && workerCount < 4) || (treeCount < 8 && workerCount < 5)) || resources > 700) && ((resources > 199 && round < 100) || (resources > 699 && round > 99))) {
                     uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
                     break;
                 }
@@ -102,11 +102,11 @@ public class Collect {
         for (int j = 0; j < locs.length; j++) {
             float value = 0;
             if (utils.isExtreme(uc, locs[j])) {
-                value -= 10000;
+                value -= 25;
             }
 
             if (utils.isWater(uc, locs[j])) {
-                value -= 5000;
+                value -= 10;
             }
 
             for (int i = 0; i < trees.length; i++) {
