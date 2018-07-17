@@ -1,4 +1,6 @@
-package aic2018;
+package workers;
+
+import aic2018.*;
 
 public class Collect {
 
@@ -97,7 +99,7 @@ public class Collect {
 
     public void plantIfNeeded() {
         for (int i = 0; i < locs.length; i++) {
-            if (uc.canUseActiveAbility(locs[i]) && utils.canPlantTree(round, resources) && (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
+            if (uc.canUseActiveAbility(locs[i]) && utils.canPlantTree(round, resources) && (workerCount >= numOaks || numAdjacentTrees < 3)) {
                 uc.useActiveAbility(locs[i]);
             }
         }
