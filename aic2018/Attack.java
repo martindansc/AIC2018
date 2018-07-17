@@ -17,7 +17,7 @@ public class Attack {
 
     public void play() {
 
-        myLocation = uc.getLocation();
+        myLocation = manager.myLocation;
         locs = utils.getLocations(uc, myLocation);
         resources = manager.resources;
 
@@ -28,14 +28,15 @@ public class Attack {
     }
 
     public void move() {
-        Location newLoc = evalLocation(myLocation);
+        Location newLoc = evalLocation();
         if (newLoc != myLocation) {
             uc.move(myLocation.directionTo(newLoc));
             manager.myLocation = newLoc;
+            myLocation = manager.myLocation;
         }
     }
 
-    public Location evalLocation(Location loc) {
+    public Location evalLocation() {
 
         Location plocs[] = utils.getPosibleMoves(uc);
         UnitInfo[] units = uc.senseUnits();
@@ -43,7 +44,7 @@ public class Attack {
         Team allies = uc.getTeam();
 
         float highestValue = -100000;
-        Location bestLocation = loc;
+        Location bestLocation = myLocation;
 
         for (int j = 0; j < plocs.length; j++) {
             float value = 0;
@@ -65,11 +66,11 @@ public class Attack {
                         value += 100 / (1 + distance) - currentUnit.getHealth()/6;
                     }
                 }
-                else if(unitType != UnitType.WORKER && unitType != UnitType.BARRACKS){
+                else if(unitType != UnitType.BARRACKS){
                     if (distance <= 4) {
-                        value -= 5;
+                        value -= 4;
                     } else if (distance < 10) {
-                        value -= 2;
+                        value -= 1;
                     }
                 }
 
