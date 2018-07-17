@@ -26,8 +26,8 @@ public class MemoryManager {
 
     public void update() {
 
-        counterMod2 = uc.getRound()%2;
-        counterMod2 = round;
+        round = uc.getRound();
+        counterMod2 = round%2;
 
         // update if I'm root
         uc.write(AMIROOT + counterMod2, 0);
