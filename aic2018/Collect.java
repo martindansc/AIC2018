@@ -38,13 +38,19 @@ public class Collect {
         tryToHarvest();
         plantIfNeeded();
         spawnIfNeeded(numAdjacentTrees);
+
     }
 
-    public void move() {
+    public Location move() {
         Location newLoc = evalLocation(uc, myLocation);
         if (newLoc != myLocation) {
             uc.move(myLocation.directionTo(newLoc));
+
+            myLocation = newLoc;
+            locs = utils.getLocations(uc, myLocation);
         }
+
+        return newLoc;
     }
 
     public void tryToHarvest() {
