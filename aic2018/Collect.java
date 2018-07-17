@@ -23,26 +23,28 @@ public class Collect {
         locs = utils.getLocations(uc, myLocation);
         resources = uc.getResources();
 
-        tryToHarvest();
-        move();
-        int numAdjacentTrees = tryToHarvest();
-        plantIfNeeded();
-        spwanIffNeeded(numAdjacentTrees);
+        tryToHarvest(locs);
+        Location myNewLocation = move();
+        Location newLocs[] = utils.getLocations(uc, myNewLocation);
+        int numAdjacentTrees = tryToHarvest(newLocs);
+        plantIfNeeded(newLocs);
+        spwanIffNeeded(numAdjacentTrees, newLocs, myNewLocation);
     }
 
-    public void move() {
+    public Location move() {
         Location newLoc = evalLocation(uc, myLocation);
         if (newLoc != myLocation) {
             uc.move(myLocation.directionTo(newLoc));
         }
+        return newLoc;
     }
 
-    public int tryToHarvest() {
+    public int tryToHarvest(Location newLocs[]) {
         int treeCount = 0;
-        for (int i = 0; i < locs.length; i++) {
-            TreeInfo newTree = uc.senseTree(locs[i]);
-            UnitInfo newUnit = uc.senseUnit(locs[i]);
-            if (newTree != null || !uc.isAccessible(locs[i])) {
+        for (int i = 0; i < newLocs.length; i++) {
+            TreeInfo newTree = uc.senseTree(newLocs[i]);
+            UnitInfo newUnit = uc.senseUnit(newLocs[i]);
+            if (newTree != null || !uc.isAccessible(newLocs[i])) {
                 treeCount++;
             }
             if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
@@ -55,17 +57,17 @@ public class Collect {
         return treeCount;
     }
 
-    public void plantIfNeeded() {
-        for (int i = 0; i < locs.length; i++) {
-            if (uc.canUseActiveAbility(locs[i]) && ((round < 100) || (resources > 699 && round > 99))) {
-                uc.useActiveAbility(locs[i]);
+    public void plantIfNeeded(Location newLocs[]) {
+        for (int i = 0; i < newLocs.length; i++) {
+            if (uc.canUseActiveAbility(newLocs[i]) && ((round < 100) || (resources > 699 && round > 99))) {
+                uc.useActiveAbility(newLocs[i]);
             }
         }
     }
 
-    public void spwanIffNeeded(int treeCount) {
+    public void spwanIffNeeded(int treeCount, Location newLocs[], Location myNewLocation) {
         UnitInfo[] units = uc.senseUnits();
-        for (int i = 0; i < locs.length; i++) {
+        for (int i = 0; i < newLocs.length; i++) {
             int workerCount = 0;
             for (int j = 0; j < units.length; j++) {
                 if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
@@ -79,9 +81,9 @@ public class Collect {
                     }
                 }
             }
-            if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
+            if (uc.canSpawn(myNewLocation.directionTo(newLocs[i]), UnitType.WORKER)) {
                 if ((((treeCount == 8 && workerCount < 4) || (treeCount < 8 && workerCount < 5)) || resources > 700) && ((resources > 199 && round < 100) || (resources > 699 && round > 99))) {
-                    uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
+                    uc.spawn(myNewLocation.directionTo(newLocs[i]), UnitType.WORKER);
                     break;
                 }
             }
