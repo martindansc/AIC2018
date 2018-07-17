@@ -14,6 +14,9 @@ public class MemoryManager {
     public Direction[] dirs;
 
     public int round;
+    public int resources;
+    public UnitInfo[] enemies;
+    public TreeInfo[] trees;
 
     public MemoryManager(UnitController uc) {
         this.uc = uc;
@@ -28,6 +31,9 @@ public class MemoryManager {
 
         round = uc.getRound();
         counterMod2 = round%2;
+        enemies = uc.senseUnits(uc.getOpponent());
+        trees = uc.senseTrees();
+        resources = uc.getResources();
 
         // update if I'm root
         uc.write(AMIROOT + counterMod2, 0);
@@ -51,7 +57,7 @@ public class MemoryManager {
     }
 
     public int getUnitNum() {
-        return uc.read(counterMod2 + 1);
+        return uc.read(counterMod2 + 1 - counterMod2);
     }
 
     public int getWorkersNum() {

@@ -11,21 +11,20 @@ public class Attack {
         uc = memoryManager.uc;
     }
 
-    private int round;
     private Location myLocation;
     private Location locs[];
     private int resources;
 
     public void play() {
 
-        round = uc.getRound();
         myLocation = uc.getLocation();
         locs = utils.getLocations(uc, myLocation);
-        resources = uc.getResources();
+        resources = manager.resources;
 
         boolean attacked = tryAttackBestUnit();
         move(attacked);
         tryAttackBestUnit();
+        tryAttackTree();
     }
 
     public void move(boolean attacked) {
@@ -90,8 +89,8 @@ public class Attack {
     }
 
     public boolean tryAttackBestUnit() {
-        UnitInfo[] enemies = uc.senseUnits(uc.getOpponent());
-        if(enemies.length == 0) return false;
+        UnitInfo[] enemies = manager.enemies;
+        if(enemies.length == 0 || !uc.canAttack()) return false;
 
         UnitInfo enemy = enemies[0];
         int maxHealth = 10001;
@@ -111,4 +110,20 @@ public class Attack {
 
         return false;
     }
+
+    public boolean tryAttackTree() {
+        TreeInfo[] trees = manager.trees;
+        if(trees.length == 0 || !uc.canAttack()) return false;
+
+        for (TreeInfo tree : trees){
+            if(tree.isOak() && uc.canAttack(tree)) {
+                uc.attack(tree);
+            }
+        }
+
+        return false;
+    }
+
+
+
 }
