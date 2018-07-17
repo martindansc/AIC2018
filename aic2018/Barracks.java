@@ -10,7 +10,7 @@ public class Barracks {
         this.manager = memoryManager;
         uc = memoryManager.uc;
 
-        typeIndex = (int)(Math.random()*2);
+        typeIndex = (int)(Math.random()*1);
     }
 
     int typeIndex;
@@ -24,7 +24,7 @@ public class Barracks {
         //try to spawn a unit of the given type, if successful reset type.
         for (int i = 0; i < 8; ++i) if (uc.canSpawn(manager.dirs[i], type)){
             uc.spawn(manager.dirs[i], type);
-            typeIndex = (int)(Math.random()*2);
+            typeIndex = (int)(Math.random()*1);
         }
     }
 

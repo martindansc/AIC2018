@@ -1,4 +1,6 @@
-package aic2018;
+package workers;
+
+import aic2018.*;
 
 public class Collect {
 
@@ -97,7 +99,7 @@ public class Collect {
 
     public void plantIfNeeded() {
         for (int i = 0; i < locs.length; i++) {
-            if (uc.canUseActiveAbility(locs[i]) && utils.canPlantTree(round, resources) && (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
+            if (uc.canUseActiveAbility(locs[i]) && utils.canPlantTree(round, resources) && (workerCount >= numOaks || numAdjacentTrees < 3)) {
                 uc.useActiveAbility(locs[i]);
             }
         }
@@ -140,22 +142,22 @@ public class Collect {
         Location bestLocation = loc;
 
         for (int j = 0; j < locs.length; j++) {
-            float value = 0;
+            int value = 0;
             if (utils.isExtreme(uc, locs[j])) {
-                value -= 25;
+                value -= 25000;
             }
 
             if (utils.isWater(uc, locs[j])) {
-                value -= 10;
+                value -= 10000;
             }
 
             for (int i = 0; i < trees.length; i++) {
                 TreeInfo currentTree = trees[i];
-                float distance = locs[j].distanceSquared(currentTree.location);
+                int distance = locs[j].distanceSquared(currentTree.location);
                 if (currentTree.oak && distance != 0) {
-                    value += 32 / (distance * distance);
+                    value += 32000 / (distance * distance);
                 } else if (distance != 0) {
-                    value += 2 / (distance * distance);
+                    value += 2000 / (distance * distance);
                 }
             }
 
@@ -167,9 +169,9 @@ public class Collect {
 
                 if (unitTeam == allies && unitType == UnitType.WORKER) {
                     if (distance <= 2) {
-                        value -= 15;
+                        value -= 10000;
                     } else if (distance < 10) {
-                        value -= 2;
+                        value -= 2000;
                     }
                 }
 
@@ -181,7 +183,7 @@ public class Collect {
             for (int i = 0; i < points.length; i++) {
                 VictoryPointsInfo currentVP = points[i];
                 float distance = locs[j].distanceSquared(currentVP.getLocation());
-                value += 2 / (1 + distance);
+                value += 200 / (1 + distance);
             }
 
             if (highestValue < value) {

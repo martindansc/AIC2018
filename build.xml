@@ -7,9 +7,9 @@
 	</target>
 
 	<scriptdef name="check_input" language="javascript">
-	    <attribute name="prop" />
-	    <attribute name="value" />
-	    <![CDATA[
+		<attribute name="prop" />
+		<attribute name="value" />
+		<![CDATA[
 			var value = attributes.get("value");
 			if (value.trim().isEmpty()) {
 				project.executeTarget("echo_empty_input");
@@ -44,8 +44,8 @@
 	</target>
 
 	<scriptdef name="get_property" language="javascript">
-	    <attribute name="prop" />
-	    <![CDATA[
+		<attribute name="prop" />
+		<![CDATA[
 			var prop = attributes.get("prop");
 			while (!project.getProperty(prop)) {
 				project.executeTarget("get_" + prop);
@@ -63,22 +63,22 @@
 
 	<!-- Utils -->
 	<scriptdef language="javascript" name="lower">
-	    <attribute name="string" />
-	    <attribute name="to" />
-	    project.setProperty(
-				attributes.get("to"),
-				attributes.get("string").toLowerCase()
-			);
+		<attribute name="string" />
+		<attribute name="to" />
+		project.setProperty(
+		attributes.get("to"),
+		attributes.get("string").toLowerCase()
+		);
 	</scriptdef>
 
 	<scriptdef language="javascript" name="replace_point">
-	    <attribute name="string" />
-	    <attribute name="char" />
-	    <attribute name="to" />
-	    project.setProperty(
-				attributes.get("to"),
-				attributes.get("string").replace(".", attributes.get("char"))
-			);
+		<attribute name="string" />
+		<attribute name="char" />
+		<attribute name="to" />
+		project.setProperty(
+		attributes.get("to"),
+		attributes.get("string").replace(".", attributes.get("char"))
+		);
 	</scriptdef>
 
 	<!-- Compile tasks -->
@@ -125,25 +125,25 @@
 
 		<!-- Compile package 1 -->
 		<record name="${basedir}/logs/compile/${folder1}" action="start"
-			 			emacsmode="true" loglevel="warn" />
+				emacsmode="true" loglevel="warn" />
 		<javac
-			srcdir="${basedir}/src/"
-			destdir="${basedir}/build/classes"
-			includes="aic2018/**,${path1}/**"
-			debug="on"
-			includeAntRuntime="false">
+				srcdir="${basedir}/src/"
+				destdir="${basedir}/build/classes"
+				includes="aic2018/**,${path1}/**"
+				debug="on"
+				includeAntRuntime="false">
 			<classpath refid="my_classpath" />
 		</javac>
 		<record name="${basedir}/logs/compile/${folder1}" action="stop" />
 		<!-- Compile package 2 -->
 		<record name="${basedir}/logs/compile/${folder2}" action="start"
-			 			emacsmode="true" loglevel="warn" />
+				emacsmode="true" loglevel="warn" />
 		<javac
-			srcdir="${basedir}/src/"
-			destdir="${basedir}/build/classes"
-			includes="aic2018/**,${path2}/**, aic2018.commons/**"
-			debug="on"
-			includeAntRuntime="false">
+				srcdir="${basedir}/src/"
+				destdir="${basedir}/build/classes"
+				includes="aic2018/**,${path2}/**, aic2018.commons/**"
+				debug="on"
+				includeAntRuntime="false">
 			<classpath refid="my_classpath" />
 		</javac>
 		<record name="${basedir}/logs/compile/${folder2}" action="stop" />
@@ -173,23 +173,23 @@
 	</target>
 
 	<!-- Ugly 'if' to check if packages are the same before instrument -->
-  <target name="instrument2" depends="instrument2-check"
-		 			if="instrument2-check-property">
+	<target name="instrument2" depends="instrument2-check"
+			if="instrument2-check-property">
 		<java classname="instrumenter.Main" failonerror="true" fork="yes">
 			<classpath refid="my_classpath" />
 			<arg value="${basedir}/build/classes/${path2}" />
 			<arg value="${path2}" />
 			<arg value="true" />
 		</java>
-  </target>
+	</target>
 
-  <target name="instrument2-check">
-    <condition property="instrument2-check-property">
+	<target name="instrument2-check">
+		<condition property="instrument2-check-property">
 			<not>
 				<equals arg1="${package1}" arg2="${package2}" />
 			</not>
-    </condition>
-  </target>
+		</condition>
+	</target>
 
 	<!-- Run tasks -->
 	<target name="run" depends="instrument">
