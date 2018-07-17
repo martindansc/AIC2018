@@ -19,6 +19,7 @@ public class MemoryManager {
 
     public int round;
     public int resources;
+    public UnitInfo[] units;
     public UnitInfo[] enemies;
     public TreeInfo[] trees;
     public Location myLocation;
@@ -48,11 +49,13 @@ public class MemoryManager {
 
     public void update() {
 
+        myLocation = uc.getLocation();
         round = uc.getRound();
         counterMod2 = round%2;
         enemies = uc.senseUnits(uc.getOpponent());
         trees = uc.senseTrees();
         resources = uc.getResources();
+        units = uc.senseUnits();
 
         // update if I'm root
         uc.write(AMIROOT + counterMod2, 0);

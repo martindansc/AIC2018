@@ -30,21 +30,17 @@ public class Collect {
         numOaks = 0;
         workerCount = 0;
 
-        round = uc.getRound();
-        myLocation = uc.getLocation();
+        round = manager.round;
+        myLocation = manager.myLocation;
         locs = utils.getLocations(uc, myLocation);
         units = uc.senseUnits();
-        trees = uc.senseTrees();
+        trees = manager.trees;
 
         tryToHarvest();
         move();
         if (!attackedThisTurn) {
             tryToHarvest();
         }
-
-        resources = uc.getResources();
-        units = uc.senseUnits();
-        trees = uc.senseTrees();
 
         countTrees();
         senseOaks();
@@ -55,10 +51,14 @@ public class Collect {
     public Location move() {
         Location newLoc = evalLocation(uc, myLocation);
         if (newLoc != myLocation) {
-            uc.move(myLocation.directionTo(newLoc));
 
             myLocation = newLoc;
             locs = utils.getLocations(uc, myLocation);
+
+            manager.resources = uc.getResources();
+            resources = manager.resources;
+            manager.units = uc.senseUnits();
+            manager.trees = uc.senseTrees();
         }
 
         return newLoc;
@@ -109,7 +109,7 @@ public class Collect {
             if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
                 workerCount++;
             }
-            if (units[j].getTeam() == manager.opponent) {
+            if (units[j].getTeam() == manager.opponent && utils.canSpawnBarraks(manager)) {
                 for (int k = 0; k < 8; k++) {
                     if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
                         uc.spawn(manager.dirs[k], UnitType.BARRACKS);
@@ -119,28 +119,34 @@ public class Collect {
             }
         }
 
-        for (int i = 0; i < locs.length; i++) {
-            if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
-                if (((treeCount == 8 && workerCount < 4) || (trees.length > (workerCount + 1) * 6) || (numOaks > workerCount + 1))
-                        && utils.canSpawnWorker(round, resources)) {
-                    uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
-                    break;
+        if (((treeCount == 8 && workerCount < 4) || (trees.length > (workerCount + 1) * 6) || (numOaks > workerCount + 1))
+                && utils.canSpawnWorker(round, resources)) {
+            for (int i = 0; i < locs.length; i++) {
+                if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
+                        uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
+                        break;
                 }
             }
         }
     }
 
+
     public Location evalLocation(UnitController uc, Location loc) {
 
         Location locs[] = utils.getPosibleMoves(uc);
         VictoryPointsInfo[] points = uc.senseVPs();
-        Team allies = uc.getTeam();
+        Team allies = manager.allies;
 
-        float highestValue = -100000;
+        float highestValue = Integer.MIN_VALUE;
         Location bestLocation = loc;
 
         for (int j = 0; j < locs.length; j++) {
             int value = 0;
+
+            if(!attackedThisTurn && locs[j].equals(myLocation)) {
+                value -= 1000;
+            }
+
             if (utils.isExtreme(uc, locs[j])) {
                 value -= 25000;
             }
@@ -161,7 +167,7 @@ public class Collect {
 
             for (int i = 0; i < units.length; i++) {
                 UnitInfo currentUnit = units[i];
-                float distance = locs[j].distanceSquared(currentUnit.getLocation());
+                int distance = locs[j].distanceSquared(currentUnit.getLocation());
                 Team unitTeam = currentUnit.getTeam();
                 UnitType unitType = currentUnit.getType();
 
@@ -180,7 +186,7 @@ public class Collect {
 
             for (int i = 0; i < points.length; i++) {
                 VictoryPointsInfo currentVP = points[i];
-                float distance = locs[j].distanceSquared(currentVP.getLocation());
+                int distance = locs[j].distanceSquared(currentVP.getLocation());
                 value += 200 / (1 + distance);
             }
 

@@ -29,7 +29,7 @@ public class Attack {
 
     public void move() {
         Location newLoc = evalLocation();
-        if (newLoc != myLocation) {
+        if (!newLoc.equals(myLocation)) {
             uc.move(myLocation.directionTo(newLoc));
             manager.myLocation = newLoc;
             myLocation = manager.myLocation;
