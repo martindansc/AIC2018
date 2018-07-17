@@ -1,6 +1,7 @@
 package aic2018;
 
 public class Utils {
+
     public void buyPointsIfNeeded(UnitController uc) {
         if (uc.canBuyVP( GameConstants.VICTORY_POINTS_MILESTONE - uc.getTeam().getVictoryPoints())){
             uc.buyVP(GameConstants.VICTORY_POINTS_MILESTONE - uc.getTeam().getVictoryPoints());
@@ -83,6 +84,18 @@ public class Utils {
             }
         }
         return false;
+    }
+
+    public Boolean canPlantTree(int round, int resources) {
+        return (round < 100) || (resources > 699 && round > 99);
+    }
+
+    public Boolean canSpawnWorker(int round, int resources) {
+        return ((resources > 199 && round < 100) || (resources > 699 && round > 99));
+    }
+
+    public Boolean canSpawnBarraks(int round, int resources) {
+        return ((resources > 199 && round < 100) || (resources > 699 && round > 99));
     }
 
 }
