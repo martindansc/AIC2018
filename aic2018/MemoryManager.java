@@ -4,6 +4,10 @@ public class MemoryManager {
 
     private int AMIROOT = 10;
 
+    private int GRAVITY_STARTS = 20;
+
+    private int ENEMIES_SEEN_LAST_ROUND = 15;
+
     public UnitController uc;
     private int counterMod2;
 
@@ -17,6 +21,9 @@ public class MemoryManager {
     public int resources;
     public UnitInfo[] enemies;
     public TreeInfo[] trees;
+    public Location myLocation;
+
+    int distanceBetweenStarters;
 
     public MemoryManager(UnitController uc) {
         this.uc = uc;
@@ -25,6 +32,18 @@ public class MemoryManager {
         opponent = uc.getOpponent();
         allies = uc.getTeam();
         dirs = Direction.values();
+
+        myLocation = uc.getLocation();
+
+        distanceBetweenStarters = Integer.MAX_VALUE;
+
+        Location[] startEnemies = uc.getTeam().getOpponent().getInitialLocations();
+        for(Location startEnemy : startEnemies) {
+            int distance = myLocation.distanceSquared(startEnemy);
+            if(distanceBetweenStarters > distance) {
+                distanceBetweenStarters = distance;
+            }
+        }
     }
 
     public void update() {
@@ -47,27 +66,55 @@ public class MemoryManager {
 
         if(root) rootUpdate();
 
+        int roundMod3 = round%3;
+        int nextRound3 = (roundMod3+1)%3;
+
         // update num units
-        uc.write(counterMod2, uc.read(counterMod2) + 1);
+        uc.write(roundMod3, uc.read(roundMod3) + 1);
+        uc.write(nextRound3, 0);
 
         if(uc.getType() == UnitType.WORKER) {
-            uc.write(counterMod2 + 2, uc.read(counterMod2 + 2) + 1);
+            uc.write(3 + roundMod3, uc.read(3 + roundMod3) + 1);
+            uc.write(3 + nextRound3, 0);
+        }
+
+        if(uc.getType() == UnitType.BARRACKS) {
+            uc.write(6 + roundMod3, uc.read(6 + roundMod3) + 1);
+            uc.write(6 + nextRound3, 0);
+        }
+
+        if(enemies.length > 0) {
+            uc.write(ENEMIES_SEEN_LAST_ROUND + roundMod3, uc.read(ENEMIES_SEEN_LAST_ROUND + roundMod3));
+            uc.write(ENEMIES_SEEN_LAST_ROUND + nextRound3, 0);
         }
 
     }
 
     public int getUnitNum() {
-        return uc.read(counterMod2 + 1 - counterMod2);
+        return  uc.read((round + 2)%3);
     }
 
     public int getWorkersNum() {
-        return uc.read(counterMod2 + 2);
+        return uc.read(3 + (round + 2)%3);
+    }
+
+    public int getBarraksNum() {
+        return uc.read(6 + (round + 2)%3);
+    }
+
+    public void barracksConstructed() {
+        int previousRound = (round + 2)%3;
+        uc.write(6 + previousRound, uc.read(previousRound) + 1);
+    }
+
+    public int getEnemiesSeenLastRound() {
+        return uc.read((ENEMIES_SEEN_LAST_ROUND + 2)%3);
     }
 
     // PRIVATE
 
     private void rootUpdate() {
-        uc.write(counterMod2, 0);
+
     }
 
 }

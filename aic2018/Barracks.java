@@ -22,9 +22,12 @@ public class Barracks {
         UnitType type = UnitType.values()[2+typeIndex];
 
         //try to spawn a unit of the given type, if successful reset type.
-        for (int i = 0; i < 8; ++i) if (uc.canSpawn(manager.dirs[i], type)){
-            uc.spawn(manager.dirs[i], type);
-            typeIndex = (int)(Math.random()*2);
+        if(manager.getEnemiesSeenLastRound() > 0) {
+            for (int i = 0; i < 8; ++i)
+                if (uc.canSpawn(manager.dirs[i], type)) {
+                    uc.spawn(manager.dirs[i], type);
+                    typeIndex = (int) (Math.random() * 2);
+                }
         }
     }
 

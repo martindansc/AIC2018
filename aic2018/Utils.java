@@ -94,8 +94,10 @@ public class Utils {
         return ((resources > 199 && round < 100) || (resources > 699 && round > 99));
     }
 
-    public Boolean canSpawnBarraks(int round, int resources) {
-        return ((resources > 199 && round < 100) || (resources > 699 && round > 99));
+    public Boolean canSpawnBarraks(MemoryManager manager) {
+        return ((manager.resources > 199 && manager.round < 100) ||
+                    (manager.resources > 699 && manager.round > 99) &&
+                    manager.getBarraksNum() < 5);
     }
 
 }

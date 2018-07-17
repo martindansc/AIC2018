@@ -84,10 +84,11 @@ public class Collect {
                 if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
                     workerCount++;
                 }
-                if (units[j].getTeam() == manager.opponent) {
+                if (units[j].getTeam() == manager.opponent && utils.canSpawnBarraks(manager)) {
                     for (int k = 0; k < 8; ++k) {
                         if (uc.canSpawn(manager.dirs[i], UnitType.BARRACKS)){
                             uc.spawn(manager.dirs[i], UnitType.BARRACKS);
+                            manager.barracksConstructed();
                         }
                     }
                 }

@@ -21,16 +21,17 @@ public class Attack {
         locs = utils.getLocations(uc, myLocation);
         resources = manager.resources;
 
-        boolean attacked = tryAttackBestUnit();
-        move(attacked);
+        tryAttackBestUnit();
+        move();
         tryAttackBestUnit();
         tryAttackTree();
     }
 
-    public void move(boolean attacked) {
+    public void move() {
         Location newLoc = evalLocation(myLocation);
         if (newLoc != myLocation) {
             uc.move(myLocation.directionTo(newLoc));
+            manager.myLocation = newLoc;
         }
     }
 
@@ -65,7 +66,7 @@ public class Attack {
                     }
                 }
                 else if(unitType != UnitType.WORKER && unitType != UnitType.BARRACKS){
-                    if (distance <= 2) {
+                    if (distance <= 4) {
                         value -= 5;
                     } else if (distance < 10) {
                         value -= 2;
