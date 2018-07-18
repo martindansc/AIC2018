@@ -42,6 +42,9 @@ public class Collect {
             tryToHarvest();
         }
 
+        manager.resources = uc.getResources();
+        resources = manager.resources;
+
         countTrees();
         senseOaks();
         spawnIfNeeded(numAdjacentTrees);
@@ -51,12 +54,9 @@ public class Collect {
     public Location move() {
         Location newLoc = evalLocation(uc, myLocation);
         if (newLoc != myLocation) {
-
+            uc.move(myLocation.directionTo(newLoc));
             myLocation = newLoc;
             locs = utils.getLocations(uc, myLocation);
-
-            manager.resources = uc.getResources();
-            resources = manager.resources;
             manager.units = uc.senseUnits();
             manager.trees = uc.senseTrees();
         }

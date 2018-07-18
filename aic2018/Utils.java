@@ -87,7 +87,7 @@ public class Utils {
     }
 
     public Boolean canPlantTree(int round, int resources) {
-        return (round < 100) || (resources > 699 && round > 99);
+        return ((round < 100) || (resources > 699 && round > 99));
     }
 
     public Boolean canSpawnWorker(int round, int resources) {
@@ -95,9 +95,7 @@ public class Utils {
     }
 
     public Boolean canSpawnBarraks(MemoryManager manager) {
-        return ((manager.resources > 199 && manager.round < 100) ||
-                    (manager.resources > 699 && manager.round > 99) &&
-                    manager.getBarraksNum() < 5);
+        return (manager.resources > 499 && manager.round > 99 && manager.getBarraksNum() < 5);
     }
 
 }
