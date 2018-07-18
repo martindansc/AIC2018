@@ -158,13 +158,11 @@ public class Collect {
 
             for (int i = 0; i < trees.length; i++) {
                 TreeInfo currentTree = trees[i];
-                if (utils.isWalkable(uc, locs[j], currentTree.getLocation())) {
-                    int distance = locs[j].distanceSquared(currentTree.getLocation());
-                    if (currentTree.oak && distance != 0) {
-                        value += 32000 / (distance * distance);
-                    } else if (distance != 0) {
-                        value += 2000 / (distance * distance);
-                    }
+                int distance = locs[j].distanceSquared(currentTree.getLocation());
+                if (currentTree.oak && distance != 0) {
+                    value += 32000 / (distance * distance);
+                } else if (distance != 0) {
+                    value += 2000 / (distance * distance);
                 }
             }
 

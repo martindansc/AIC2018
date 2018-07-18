@@ -4,8 +4,6 @@ public class MemoryManager {
 
     private int AMIROOT = 10;
 
-    private int GRAVITY_STARTS = 20;
-
     private int ENEMIES_SEEN_LAST_ROUND = 15;
 
     public UnitController uc;
@@ -16,6 +14,7 @@ public class MemoryManager {
     public Team opponent;
     public Team allies;
     public Direction[] dirs;
+    public Location[] startEnemies;
 
     public int round;
     public int resources;
@@ -38,7 +37,7 @@ public class MemoryManager {
 
         distanceBetweenStarters = Integer.MAX_VALUE;
 
-        Location[] startEnemies = uc.getTeam().getOpponent().getInitialLocations();
+        startEnemies = uc.getTeam().getOpponent().getInitialLocations();
         for(Location startEnemy : startEnemies) {
             int distance = myLocation.distanceSquared(startEnemy);
             if(distanceBetweenStarters > distance) {
@@ -103,6 +102,10 @@ public class MemoryManager {
 
     public int getBarraksNum() {
         return uc.read(6 + (round + 2)%3);
+    }
+
+    public int getTroopsNum() {
+        return getUnitNum() - getWorkersNum() - getBarraksNum();
     }
 
     public void barracksConstructed() {

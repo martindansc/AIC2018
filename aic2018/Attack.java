@@ -5,21 +5,34 @@ public class Attack {
     private MemoryManager manager;
     private UnitController uc;
     private Utils utils = new Utils();
+    private Pathfind pathfind;
+    Location target;
 
     public Attack(MemoryManager memoryManager) {
         this.manager = memoryManager;
         uc = memoryManager.uc;
+        pathfind = new Pathfind(manager);
+        aggresive = false;
+
+        // choose randomly one objective
+        target = manager.startEnemies[(int)(Math.random()*manager.startEnemies.length)];
     }
 
     private Location myLocation;
     private Location locs[];
     private int resources;
+    private boolean aggresive;
+    private Location nextForTarget;
 
     public void play() {
 
         myLocation = manager.myLocation;
         locs = utils.getLocations(uc, myLocation);
         resources = manager.resources;
+
+        if(manager.getTroopsNum() > 20) {
+            aggresive = true;
+        }
 
         tryAttackBestUnit();
         move();
@@ -28,6 +41,14 @@ public class Attack {
     }
 
     public void move() {
+        if(aggresive) {
+            Direction dir = pathfind.getNextLocationTarget(target);
+            if(dir != null) nextForTarget = myLocation.add(dir);
+        }
+        else {
+            nextForTarget = null;
+        }
+
         Location newLoc = evalLocation();
         if (!newLoc.equals(myLocation)) {
             uc.move(myLocation.directionTo(newLoc));
@@ -48,6 +69,8 @@ public class Attack {
 
         for (int j = 0; j < plocs.length; j++) {
             float value = 0;
+
+            int numWorkers = 0;
 
             for (int i = 0; i < units.length; i++) {
                 UnitInfo currentUnit = units[i];
@@ -72,6 +95,21 @@ public class Attack {
                     } else if (distance < 10) {
                         value -= 1;
                     }
+                }
+                else {
+                    numWorkers++;
+                }
+
+                // stay at the front line
+                if(numWorkers > 3) {
+                    value -= 1;
+                }
+                else {
+                    value += 1;
+                }
+
+                if(nextForTarget != null && nextForTarget.isEqual(plocs[j])) {
+                    value += 3;
                 }
 
             }

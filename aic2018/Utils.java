@@ -98,19 +98,4 @@ public class Utils {
         return (manager.resources > 499 && manager.round > 99 && manager.getBarraksNum() < 3);
     }
 
-    public Boolean isWalkable(UnitController uc, Location from, Location to) {
-        VisibleCells var3 = VisibleCells.getInstance();
-        int var4 = to.x - from.x + var3.center;
-        int var5 = to.y - from.y + var3.center;
-
-        for(int var6 = 0; var6 < var3.offsetX[var4][var5].length; ++var6) {
-            Location var7 = from.add(var3.offsetX[var4][var5][var6], var3.offsetY[var4][var5][var6]);
-            if (!var7.isEqual(to) && !var7.isEqual(from) && uc.senseWaterAtLocation(var7)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 }
