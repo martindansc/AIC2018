@@ -1,13 +1,6 @@
-Change worker spawn to spawn if: T/6 > W + 1 (float), where T is the trees that he sees and W are the allied workers that he sees.
-	- Pros:
-	- In case a unit sees a forest it will spawn workers instead of trees
-
-	- Cons:
-	- In a map like chess, a worker can only cut 4-5 trees, so maybe not enough workers will be spawned. This can be fixed with some conditionals.
-
 Soldier attack logic steps:
-- Initialize my dmg according to my level and my active ability
-- Check for unit with highest health that can be killed
+- Initialize my dmg according to my level and my active ability (done wiwhout active)
+- Check for unit with highest health that can be killed (done wiwhout active)
 - If the final chosen unit to attack dies also without the active ability, don't use it.
 - In case that there is a tie and the unit can be killed, check for attack cooldown and choose the one that can attack next turn.
 - In case of tie, choose the highest damaging unit.
@@ -15,17 +8,19 @@ Soldier attack logic steps:
 - In case of tie, choose the one with more XP.
 - In case of tie, choose the closest one.
 - In case of tie, random.
+- If it can't be killed:
+	- Attack the lowest health one (done wiwhout active)
+	
+Soldiers others:
+- Archers should always use the active
+- Knights should only dash archers or workers (only if they are not already next to one of them)
+- Soldiers gravity: Known enemy location > Enemy starting position (if not currently seen and free of enemiees) > Part of the map not explored (a function should be done for this last part)
 
-Soldiers should:
-- Try to attack
-- Try to move
-- Try to attack
 
-Workers should:
-- Try to harvest (priority: small trees > oaks; high health > low health)
-- Move
-- Try to harvest
-- Plant tree (near other trees if possible) and or spawn worker (preferably in the direction they last moved)
+
+Workers should prioritize:
+- Harvest priority: small trees > oaks; high health > low health)
+- Spawn worker (preferably in the direction they last moved) && Plant tree (near other trees if possible)
 
 Other:
 - Improve water vs allied worked gravity ratio
