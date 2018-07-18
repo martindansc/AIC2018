@@ -88,7 +88,6 @@ public class Collect {
             if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
                 if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == manager.opponent)) {
                     uc.attack(newTree);
-                    uc.drawPoint(locs[i], "Tree");
                     attackedThisTurn = true;
                     break;
                 }
@@ -114,6 +113,7 @@ public class Collect {
                 for (int k = 0; k < 8; k++) {
                     if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
                         uc.spawn(manager.dirs[k], UnitType.BARRACKS);
+                        manager.barracksConstructed();
                         break;
                     }
                 }
@@ -144,7 +144,7 @@ public class Collect {
         for (int j = 0; j < locs.length; j++) {
             int value = 0;
 
-            if(!attackedThisTurn && locs[j].equals(myLocation)) {
+            if(!attackedThisTurn && locs[j].isEqual(myLocation)) {
                 value -= 50000;
             }
 
@@ -179,11 +179,8 @@ public class Collect {
                     if (distance <= 2) {
                         value -= 10000;
                     }
-                    else if (distance == 3) {
-                        value -= 2000;
-                    }
                     else if (distance < 10) {
-                        value -= 10000/ (distance * distance);
+                        value -= 2000;
                     }
                     
                     if(!attackedThisTurn) {
@@ -199,7 +196,13 @@ public class Collect {
             for (int i = 0; i < points.length; i++) {
                 VictoryPointsInfo currentVP = points[i];
                 int distance = locs[j].distanceSquared(currentVP.getLocation());
-                value += 200 / (1 + distance);
+                if(distance != 0) {
+                    value += 200 / (1 + distance);
+                }
+                else {
+                    value -= 200;
+                }
+
             }
 
             if (highestValue < value) {
