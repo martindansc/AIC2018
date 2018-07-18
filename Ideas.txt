@@ -12,11 +12,9 @@ Soldier attack logic steps:
 	- Attack the lowest health one (done wiwhout active)
 	
 Soldiers others:
-- Archers should always use the active
+- If Archers can't kill anyone, then they should always use the active on the highest health target
 - Knights should only dash archers or workers (only if they are not already next to one of them)
 - Soldiers gravity: Known enemy location > Enemy starting position (if not currently seen and free of enemiees) > Part of the map not explored (a function should be done for this last part)
-
-
 
 Workers should prioritize:
 - Harvest priority: small trees > oaks; high health > low health)
