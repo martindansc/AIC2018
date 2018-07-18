@@ -16,7 +16,7 @@ public class UnitPlayer {
             memoryManager.update();
 
             if(memoryManager.root && uc.getRound()%100 == 0) uc.println("Units " + memoryManager.getUnitNum() + ", "
-                   + memoryManager.getWorkersNum() +  " at round " + uc.getRound());
+                   + memoryManager.getWorkersNum() + "," + memoryManager.getBarraksNum() +  " at round " + uc.getRound());
 
             utils.buyPointsIfNeeded(uc);
             utils.pickVictoryPoints(uc);

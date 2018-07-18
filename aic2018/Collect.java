@@ -88,6 +88,7 @@ public class Collect {
             if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
                 if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == manager.opponent)) {
                     uc.attack(newTree);
+                    uc.drawPoint(locs[i], "Tree");
                     attackedThisTurn = true;
                     break;
                 }
@@ -144,11 +145,11 @@ public class Collect {
             int value = 0;
 
             if(!attackedThisTurn && locs[j].equals(myLocation)) {
-                value -= 1000;
+                value -= 50000;
             }
 
             if (utils.isExtreme(uc, locs[j])) {
-                value -= 25000;
+                value -= 50000;
             }
 
             if (utils.isWater(uc, locs[j])) {
@@ -157,13 +158,16 @@ public class Collect {
 
             for (int i = 0; i < trees.length; i++) {
                 TreeInfo currentTree = trees[i];
-                int distance = locs[j].distanceSquared(currentTree.location);
-                if (currentTree.oak && distance != 0) {
-                    value += 32000 / (distance * distance);
-                } else if (distance != 0) {
-                    value += 2000 / (distance * distance);
+                if (utils.isWalkable(uc, locs[j], currentTree.getLocation())) {
+                    int distance = locs[j].distanceSquared(currentTree.getLocation());
+                    if (currentTree.oak && distance != 0) {
+                        value += 32000 / (distance * distance);
+                    } else if (distance != 0) {
+                        value += 2000 / (distance * distance);
+                    }
                 }
             }
+
 
             for (int i = 0; i < units.length; i++) {
                 UnitInfo currentUnit = units[i];
@@ -174,8 +178,16 @@ public class Collect {
                 if (unitTeam == allies && unitType == UnitType.WORKER) {
                     if (distance <= 2) {
                         value -= 10000;
-                    } else if (distance < 10) {
+                    }
+                    else if (distance == 3) {
                         value -= 2000;
+                    }
+                    else if (distance < 10) {
+                        value -= 10000/ (distance * distance);
+                    }
+                    
+                    if(!attackedThisTurn) {
+                        value -= 5000;
                     }
                 }
 

@@ -66,7 +66,7 @@ public class Attack {
                         value += 100 / (1 + distance) - currentUnit.getHealth()/6;
                     }
                 }
-                else if(unitType != UnitType.BARRACKS){
+                else if(unitType != UnitType.WORKER && unitType != UnitType.BARRACKS){
                     if (distance <= 4) {
                         value -= 4;
                     } else if (distance < 10) {
