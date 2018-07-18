@@ -95,7 +95,7 @@ public class Utils {
     }
 
     public Boolean canSpawnBarraks(MemoryManager manager) {
-        return (manager.resources > 499 && manager.round > 99 && manager.getBarraksNum() < 3);
+        return (manager.resources > 499 && manager.round > 99);
     }
 
 }

@@ -38,6 +38,7 @@ public class Collect {
 
         tryToHarvest();
         move();
+
         if (!attackedThisTurn) {
             tryToHarvest();
         }
@@ -109,11 +110,19 @@ public class Collect {
             if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
                 workerCount++;
             }
-            if (units[j].getTeam() == manager.opponent && utils.canSpawnBarraks(manager)) {
+            if (units[j].getTeam() == manager.opponent && utils.canSpawnBarraks(manager) && manager.getBarracksNum() < 5) {
                 for (int k = 0; k < 8; k++) {
                     if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
                         uc.spawn(manager.dirs[k], UnitType.BARRACKS);
-                        manager.barracksConstructed();
+
+                        // Updates barracks in construction
+                        uc.write(6, uc.read(6) + 1);
+                        for (int i = 20; i < 40; i = i + 2) {
+                            if (uc.read(i) == 0) {
+                                uc.write(i, uc.senseUnit(myLocation.add(manager.dirs[k])).getID());
+                                break;
+                            }
+                        }
                         break;
                     }
                 }

@@ -30,10 +30,6 @@ public class Attack {
         locs = utils.getLocations(uc, myLocation);
         resources = manager.resources;
 
-        if(manager.getTroopsNum() > 20) {
-            aggresive = true;
-        }
-
         tryAttackBestUnit();
         move();
         tryAttackBestUnit();
