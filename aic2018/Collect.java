@@ -97,7 +97,8 @@ public class Collect {
 
     public void plantIfNeeded() {
         for (int i = 0; i < locs.length; i++) {
-            if (uc.canUseActiveAbility(locs[i]) && utils.canPlantTree(round, resources) && (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
+            if (uc.canUseActiveAbility(locs[i]) && utils.canPlantTree(manager) &&
+                    (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
                 uc.useActiveAbility(locs[i]);
             }
         }
@@ -121,7 +122,7 @@ public class Collect {
         }
 
         if (((treeCount == 8 && workerCount < 4) || (trees.length > (workerCount + 1) * 6) || (numOaks > workerCount + 1))
-                && utils.canSpawnWorker(round, resources)) {
+                && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
                         uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);

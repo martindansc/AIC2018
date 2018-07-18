@@ -4,7 +4,11 @@ public class MemoryManager {
 
     private int AMIROOT = 10;
 
+    private int BARRACKS = 6;
+
     private int ENEMIES_SEEN_LAST_ROUND = 15;
+
+    private int AT_LEAST_ONE_ENEMY = 20;
 
     public UnitController uc;
     private int counterMod2;
@@ -25,6 +29,10 @@ public class MemoryManager {
 
     int distanceBetweenStarters;
 
+    UnitType objective;
+
+    int roundBarracks;
+
     public MemoryManager(UnitController uc) {
         this.uc = uc;
         round = uc.getRound();
@@ -44,6 +52,9 @@ public class MemoryManager {
                 distanceBetweenStarters = distance;
             }
         }
+
+        objective = UnitType.WORKER;
+        roundBarracks = Math.min(100, distanceBetweenStarters);
     }
 
     public void update() {
@@ -80,14 +91,11 @@ public class MemoryManager {
             uc.write(3 + nextRound3, 0);
         }
 
-        if(uc.getType() == UnitType.BARRACKS) {
-            uc.write(6 + roundMod3, uc.read(6 + roundMod3) + 1);
-            uc.write(6 + nextRound3, 0);
-        }
-
         if(enemies.length > 0) {
             uc.write(ENEMIES_SEEN_LAST_ROUND + roundMod3, uc.read(ENEMIES_SEEN_LAST_ROUND + roundMod3));
             uc.write(ENEMIES_SEEN_LAST_ROUND + nextRound3, 0);
+
+            uc.write(AT_LEAST_ONE_ENEMY, 1);
         }
 
     }
@@ -101,20 +109,23 @@ public class MemoryManager {
     }
 
     public int getBarraksNum() {
-        return uc.read(6 + (round + 2)%3);
+        return uc.read(6);
     }
 
     public int getTroopsNum() {
-        return getUnitNum() - getWorkersNum() - getBarraksNum();
+        return getUnitNum() - getWorkersNum();
     }
 
     public void barracksConstructed() {
-        int previousRound = (round + 2)%3;
-        uc.write(6 + previousRound, uc.read(previousRound) + 1);
+        uc.write(BARRACKS, uc.read(BARRACKS) + 1);
     }
 
     public int getEnemiesSeenLastRound() {
         return uc.read((ENEMIES_SEEN_LAST_ROUND + 2)%3);
+    }
+
+    public int getAtLeastOneEnemy() {
+        return uc.read(AT_LEAST_ONE_ENEMY);
     }
 
     // PRIVATE

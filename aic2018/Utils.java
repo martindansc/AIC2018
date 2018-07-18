@@ -86,16 +86,17 @@ public class Utils {
         return false;
     }
 
-    public Boolean canPlantTree(int round, int resources) {
-        return ((round < 100) || (resources > 699 && round > 99));
+    public Boolean canPlantTree(MemoryManager manager) {
+        return ((manager.round < manager.roundBarracks) || manager.resources > 699);
     }
 
-    public Boolean canSpawnWorker(int round, int resources) {
-        return ((resources > 199 && round < 100) || (resources > 699 && round > 99));
+    public Boolean canSpawnWorker(MemoryManager manager) {
+        return ((manager.resources > 199 && manager.objective == UnitType.WORKER));
     }
 
     public Boolean canSpawnBarraks(MemoryManager manager) {
-        return (manager.resources > 499 && manager.round > 99 && manager.getBarraksNum() < 3);
+        return (manager.resources > 499 && manager.round > manager.roundBarracks &&
+                manager.getBarraksNum() < manager.round/150 + 1);
     }
 
 }

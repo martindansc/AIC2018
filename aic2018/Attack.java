@@ -19,16 +19,12 @@ public class Attack {
     }
 
     private Location myLocation;
-    private Location locs[];
-    private int resources;
     private boolean aggresive;
     private Location nextForTarget;
 
     public void play() {
 
         myLocation = manager.myLocation;
-        locs = utils.getLocations(uc, myLocation);
-        resources = manager.resources;
 
         if(manager.getTroopsNum() > 20) {
             aggresive = true;
@@ -93,7 +89,7 @@ public class Attack {
                     if (distance <= 4) {
                         value -= 4;
                     } else if (distance < 10) {
-                        value -= 1;
+                        value -= 2;
                     }
                 }
                 else {
