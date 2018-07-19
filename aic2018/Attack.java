@@ -29,7 +29,7 @@ public class Attack {
         myLocation = manager.myLocation;
 
         if(!exploring) {
-            aggressive = true;
+            aggressive = false;
         }
 
         if(myLocation.distanceSquared(target) < 10) {

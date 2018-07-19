@@ -115,7 +115,6 @@ public class Collect {
         if(utils.canPlantTree(manager) && (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canUseActiveAbility(locs[i]) ) {
-                    manager.objectiveCompleted();
                     uc.useActiveAbility(locs[i]);
                 }
             }
@@ -124,8 +123,6 @@ public class Collect {
 
     private void spwanBarracks(Direction dir) {
         uc.spawn(dir, UnitType.BARRACKS);
-
-        manager.objectiveCompleted();
 
         // Updates barracks in construction
         uc.write(6, uc.read(6) + 1);
@@ -162,7 +159,7 @@ public class Collect {
             }
         }
 
-        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.3))
+        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1)))
                 && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {

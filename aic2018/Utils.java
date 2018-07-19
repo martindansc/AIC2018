@@ -156,12 +156,20 @@ public class Utils {
         return false;
     }
 
-    public Boolean canPlantTree(MemoryManager manager) {
-        return manager.resources > 199 && (manager.resources - 199 > manager.limitGoldWorkers);
+    /*public Boolean canPlantTree(MemoryManager manager) {
+        return manager.resources > 199 && (manager.objective == UnitType.WORKER || manager.resources - 199 > manager.limitGoldWorkers);
     }
 
     public Boolean canSpawnWorker(MemoryManager manager) {
         return (manager.resources > 199 && (manager.objective == UnitType.WORKER || manager.resources - 100 > manager.limitGoldWorkers));
+    }*/
+
+    public Boolean canPlantTree(MemoryManager manager) {
+        return((manager.round < 100 && manager.resources > 199) || (manager.resources > 699 && manager.round > 99));
+    }
+
+    public Boolean canSpawnWorker(MemoryManager manager) {
+        return ((manager.resources > 199 && manager.round < 100) || (manager.resources > 699 && manager.round > 99));
     }
 
     public Boolean canSpawnBarraks(UnitInfo unit, MemoryManager manager) {
@@ -169,6 +177,7 @@ public class Utils {
     }
 
     public Boolean canSpawnBarraks(MemoryManager manager) {
+
         boolean closeEnough = false;
         for(Location enemyStart : manager.startEnemies) {
             if(manager.distanceBetweenStarters * 0.5 > manager.myLocation.distanceSquared(enemyStart)) {

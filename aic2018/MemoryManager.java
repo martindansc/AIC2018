@@ -141,7 +141,7 @@ public class MemoryManager {
             if(round >= roundBarracks && getBarracksNum() + getBarracksConsNum() < 1) {
                 uc.write(OBJECTIVE, 1);
             }
-            else if(round < roundBarracks || Math.random()*1600 > round + getEnemiesSeenLastRound() * 5) {
+            else if(round < roundBarracks || getEnemiesSeenLastRound() > 0) {
                 uc.write(OBJECTIVE, 0);
                 uc.write(LIMIT_GOLD_WORKERS, Math.max(500, limitGoldWorkers));
             }
