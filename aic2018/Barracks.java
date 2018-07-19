@@ -22,7 +22,7 @@ public class Barracks {
         //Getting the type associated to typeIndex
         myLocation = manager.myLocation;
         //try to spawn a unit of the given type, if successful reset type.
-        if(manager.objective != UnitType.WORKER && manager.objective != UnitType.BARRACKS
+        if(!manager.checkIfObjectiveCompleted() && manager.objective != UnitType.WORKER && manager.objective != UnitType.BARRACKS
                 && (manager.getEnemiesSeenLastRound() > 0 || manager.getWarriorsNum() < 5)) {
             for (int i = 0; i < 8; ++i) {
                 if (uc.canSpawn(manager.dirs[i], manager.objective)) {

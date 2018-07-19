@@ -64,7 +64,7 @@ public class MemoryManager {
         }
 
         objective = UnitType.WORKER;
-        roundBarracks = Math.min(100, distanceBetweenStarters);
+        roundBarracks = 100;
     }
 
     public void update() {
@@ -143,7 +143,7 @@ public class MemoryManager {
             }
             else if(round < roundBarracks || Math.random()*1600 > round + getEnemiesSeenLastRound() * 5) {
                 uc.write(OBJECTIVE, 0);
-                uc.write(LIMIT_GOLD_WORKERS, Math.max(700, LIMIT_GOLD_WORKERS));
+                uc.write(LIMIT_GOLD_WORKERS, Math.max(700, limitGoldWorkers));
             }
             else {
                 uc.write(OBJECTIVE, randomPonderedUnit());
