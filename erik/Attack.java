@@ -1,4 +1,6 @@
-package aic2018;
+package erik;
+
+import aic2018.*;
 
 public class Attack {
 
@@ -8,31 +10,27 @@ public class Attack {
     private Pathfind pathfind;
     Location target;
 
-    public Attack(MemoryManager memoryManager) {
-        this.manager = memoryManager;
-        uc = memoryManager.uc;
+    public Attack(MemoryManager manager) {
+        this.manager = manager;
+        uc = manager.uc;
         pathfind = new Pathfind(manager);
-        aggressive = false;
+        aggresive = false;
 
         // choose randomly one objective
         target = manager.startEnemies[(int)(Math.random()*manager.startEnemies.length)];
     }
 
     private Location myLocation;
-    private boolean aggressive;
+    private Location locs[];
+    private int resources;
+    private boolean aggresive;
     private Location nextForTarget;
 
     public void play() {
 
         myLocation = manager.myLocation;
-
-        if(manager.getWarriorsNum() > 20) {
-            aggressive = true;
-        }
-
-        if(myLocation.distanceSquared(target) < 25) {
-            aggressive = false;
-        }
+        locs = utils.getLocations(uc, myLocation);
+        resources = manager.resources;
 
         tryAttackBestUnit();
         move();
@@ -41,7 +39,7 @@ public class Attack {
     }
 
     public void move() {
-        if(aggressive) {
+        if(aggresive) {
             Direction dir = pathfind.getNextLocationTarget(target);
             if(dir != null) nextForTarget = myLocation.add(dir);
         }
@@ -89,12 +87,11 @@ public class Attack {
                         value += 100 / (1 + distance) - currentUnit.getHealth()/6;
                     }
                 }
-                else if(unitType != UnitType.WORKER && unitType != UnitType.BARRACKS
-                        && !aggressive){
+                else if(unitType != UnitType.WORKER && unitType != UnitType.BARRACKS){
                     if (distance <= 4) {
                         value -= 4;
                     } else if (distance < 10) {
-                        value -= 2;
+                        value -= 1;
                     }
                 }
                 else {
@@ -109,8 +106,7 @@ public class Attack {
                     value += 1;
                 }
 
-                if(aggressive && nextForTarget != null &&
-                        nextForTarget.isEqual(plocs[j])) {
+                if(nextForTarget != null && nextForTarget.isEqual(plocs[j])) {
                     value += 3;
                 }
 
