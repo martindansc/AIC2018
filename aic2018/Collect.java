@@ -112,9 +112,9 @@ public class Collect {
     }
 
     public void plantIfNeeded() {
-        if(utils.canPlantTree(manager)) {
+        if(utils.canPlantTree(manager) && (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
             for (int i = 0; i < locs.length; i++) {
-                if (uc.canUseActiveAbility(locs[i]) && (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
+                if (uc.canUseActiveAbility(locs[i]) ) {
                     uc.useActiveAbility(locs[i]);
                 }
             }

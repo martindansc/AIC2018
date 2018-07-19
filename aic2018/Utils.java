@@ -157,11 +157,11 @@ public class Utils {
     }
 
     public Boolean canPlantTree(MemoryManager manager) {
-        return manager.resources > 179 && (manager.objective == UnitType.WORKER || manager.resources > 700);
+        return manager.getEnemiesSeenLastRound() == 0 && manager.resources > 179 && (manager.objective == UnitType.WORKER || manager.resources - 180 > manager.limitGoldWorkers);
     }
 
     public Boolean canSpawnWorker(MemoryManager manager) {
-        return (manager.resources > 199 && (manager.objective == UnitType.WORKER || manager.resources > 700));
+        return (!manager.checkIfObjectiveCompleted() && manager.resources > 199 && (manager.objective == UnitType.WORKER || manager.resources - 100 > manager.limitGoldWorkers));
     }
 
     public Boolean canSpawnBarraks(UnitInfo unit, MemoryManager manager) {
@@ -176,7 +176,7 @@ public class Utils {
                 break;
             }
         }
-        return manager.getBarracksNum() < 1 && manager.resources > 499 && closeEnough;
+        return !manager.checkIfObjectiveCompleted() && manager.getBarracksNum() < 1 && manager.resources > 499 && closeEnough;
     }
 
 }

@@ -13,7 +13,7 @@ public class MemoryManager {
     private int OBJECTIVE = 17;
     private int OBJECTIVE_COMPLETED = 18;
 
-    private int DISTANCE_STARTERS = 19;
+    private int  LIMIT_GOLD_WORKERS = 19;
 
     public UnitController uc;
 
@@ -32,6 +32,8 @@ public class MemoryManager {
     public UnitInfo[] enemies;
     public TreeInfo[] trees;
     public Location myLocation;
+
+    public int limitGoldWorkers = 0;
 
     int distanceBetweenStarters;
 
@@ -89,6 +91,8 @@ public class MemoryManager {
         }
 
 
+        limitGoldWorkers = uc.read(LIMIT_GOLD_WORKERS);
+
         if(root) rootUpdate();
 
         if(enemies.length> 0) uc.write(AT_LEAST_ONE_ENEMY, 1);
@@ -131,6 +135,23 @@ public class MemoryManager {
 
     // PRIVATE
 
+    private void updateObjective() {
+        //update objective
+        if(uc.read(OBJECTIVE_COMPLETED) == 1) {
+            if(round >= roundBarracks && getBarracksNum() + getBarracksConsNum() < 1) {
+                uc.write(OBJECTIVE, 1);
+            }
+            else if(round < roundBarracks || Math.random()*1600 > round + getEnemiesSeenLastRound() * 5) {
+                uc.write(OBJECTIVE, 0);
+                uc.write(LIMIT_GOLD_WORKERS, Math.max(700, LIMIT_GOLD_WORKERS));
+            }
+            else {
+                uc.write(OBJECTIVE, randomPonderedUnit());
+            }
+            uc.write(OBJECTIVE_COMPLETED, 0);
+        }
+    }
+
     private void rootUpdate() {
         // Updates workers
         uc.write(2, uc.read(3));
@@ -170,29 +191,17 @@ public class MemoryManager {
             }
         }
 
+        updateObjective();
 
-        //update objective
-        if(uc.read(OBJECTIVE_COMPLETED) == 1 && getAtLeastOneEnemy() == 0) {
-            if(round >= roundBarracks && getBarracksNum() + getBarracksConsNum() < 1) {
-                uc.write(OBJECTIVE, 1);
-            }
-            else if(round < roundBarracks || Math.random()*1600 > round*2) {
-                uc.write(OBJECTIVE, 0);
-            }
-            else {
-                uc.write(OBJECTIVE, randomPonderedUnit());
-            }
-            uc.write(OBJECTIVE_COMPLETED, 0);
-        }
-        else if(getAtLeastOneEnemy() > 0){
-            uc.write(OBJECTIVE, randomPonderedUnit());
-            uc.write(OBJECTIVE_COMPLETED, 0);
-        }
 
     }
 
     public void objectiveCompleted() {
         uc.write(OBJECTIVE_COMPLETED, 1);
+    }
+
+    public boolean checkIfObjectiveCompleted() {
+        return uc.read(OBJECTIVE_COMPLETED) == 1;
     }
 
     private int randomPonderedUnit() {
