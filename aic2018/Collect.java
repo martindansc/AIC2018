@@ -20,6 +20,7 @@ public class Collect {
 
     private int numAdjacentTrees = 0;
     private int numOaks = 0;
+    private int numSmalls = 0;
     private int workerCount = 0;
     private boolean attackedThisTurn = false;
 
@@ -28,6 +29,7 @@ public class Collect {
         attackedThisTurn = false;
         numAdjacentTrees = 0;
         numOaks = 0;
+        numSmalls = 0;
         workerCount = 0;
 
         round = manager.round;
@@ -48,6 +50,7 @@ public class Collect {
 
         countTrees();
         senseOaks();
+        senseSmalls();
         spawnIfNeeded(numAdjacentTrees);
         plantIfNeeded();
     }
@@ -76,8 +79,20 @@ public class Collect {
 
     public void senseOaks() {
         for (int i = 0; i < trees.length; i++) {
-            if (trees[i].oak == true) {
+            boolean water = utils.isObstructedWater(uc, myLocation, trees[i].location);
+            if (water) {
+                break;
+            }
+            if (trees[i].oak == true && !water) {
                 numOaks++;
+            }
+        }
+    }
+
+    public void senseSmalls() {
+        for (int i = 0; i < trees.length; i++) {
+            if (trees[i].oak == false) {
+                numSmalls++;
             }
         }
     }
@@ -185,7 +200,7 @@ public class Collect {
 
             for (int i = 0; i < trees.length; i++) {
                 TreeInfo currentTree = trees[i];
-                int distance = locs[j].distanceSquared(currentTree.getLocation());
+                int distance = locs[j].distanceSquared(currentTree.location);
                 if (currentTree.oak && distance != 0) {
                     value += 32000 / (distance * distance);
                 } else if (distance != 0) {

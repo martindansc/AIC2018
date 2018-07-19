@@ -86,6 +86,76 @@ public class Utils {
         return false;
     }
 
+    public boolean isObstructedWater(UnitController uc, Location var1, Location var2) {
+        int x1 = var1.x;
+        int x2 = var2.x;
+        int y1 = var1.y;
+        int y2 = var2.y;
+        int rise = y2 - y1;
+        int run = x2 - x1;;
+        if (run == 0) {
+            if(y2 < y1) {
+                y1 = var2.y;
+                y2 = var1.y;
+                for (int y = y1 + 1; y < y2; y++) {
+                    Location newLoc = new Location(x1, y);
+                    if (uc.senseWaterAtLocation(newLoc)) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            int adjust = -1;
+            int offset = 0;
+            double threshold = 0.5;
+            float slope = rise / run;
+            if (slope >= 0) {
+                adjust = 1;
+            }
+            if (slope <= 1 && slope >= -1) {
+                double delta = Math.abs(slope);
+                int y = var1.y;
+                if (x2 < x1) {
+                    x1 = var2.x;
+                    x2 = var1.x;
+                    y = y2;
+                }
+                for (int x = x1; x < x2; x++) {
+                    Location newLoc = new Location(x, y);
+                    if (uc.senseWaterAtLocation(newLoc)) {
+                        return true;
+                    }
+                    offset += delta;
+                    if (offset >= threshold) {
+                        y += adjust;
+                        threshold += 1;
+                    }
+                }
+            } else {
+                float invSlope = run / rise;
+                double delta = Math.abs(invSlope);
+                int x = x1;
+                if (y2 < y1) {
+                    y1 = var2.y;
+                    y2 = var1.y;
+                    x = x2;
+                }
+                for (int y = y1; y < y2; y++) {
+                    Location newLoc = new Location(x, y);
+                    if (uc.senseWaterAtLocation(newLoc)) {
+                        return true;
+                    }
+                    offset += delta;
+                    if (offset >= threshold) {
+                        x += adjust;
+                        threshold += 1;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public Boolean canPlantTree(MemoryManager manager) {
         return manager.resources > 179 && manager.objective == UnitType.WORKER;
     }
