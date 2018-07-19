@@ -164,12 +164,11 @@ public class Utils {
         return ((manager.resources > 199 && manager.round < manager.roundBarracks) || (manager.resources > 699 && manager.round > manager.roundBarracks));
     }
 
-    public Boolean canSpawnBarraks(UnitInfo unit, MemoryManager manager) {
-        return ((unit.getTeam() == manager.opponent && manager.getBarracksNum() < 6) && manager.resources > 499);
+    public Boolean canSpawnBarracks(UnitInfo unit, MemoryManager manager) {
+        return (unit.getTeam() == manager.opponent && manager.getBarracksNum() < 6 && manager.resources > 499 && manager.round > 99);
     }
 
     public Boolean canSpawnBarraks(MemoryManager manager) {
-
         boolean closeEnough = false;
         for(Location enemyStart : manager.startEnemies) {
             if(manager.distanceBetweenStarters * 0.5 > manager.myLocation.distanceSquared(enemyStart)) {
