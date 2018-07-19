@@ -152,21 +152,11 @@ public class Collect {
             }
         }
 
-        if (utils.canSpawnBarraks(manager)) {
-            for (int k = 0; k < 8; k++) {
-                if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
-                    spwanBarracks(manager.dirs[k]);
-                    break;
-                }
-            }
-        }
-
         if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1)*1.3))
                 && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
                         uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
-                        manager.objectiveCompleted();
                         break;
                 }
             }
