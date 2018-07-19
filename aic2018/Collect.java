@@ -140,21 +140,12 @@ public class Collect {
             if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
                 workerCount++;
             }
-            if (utils.canSpawnBarraks(units[j], manager)) {
+            if (utils.canSpawnBarracks(units[j], manager)) {
                 for (int k = 0; k < 8; k++) {
                     if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
                         spwanBarracks(manager.dirs[k]);
                         break;
                     }
-                }
-            }
-        }
-
-        if (utils.canSpawnBarraks(manager)) {
-            for (int k = 0; k < 8; k++) {
-                if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
-                    spwanBarracks(manager.dirs[k]);
-                    break;
                 }
             }
         }
