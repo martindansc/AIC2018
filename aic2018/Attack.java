@@ -13,6 +13,7 @@ public class Attack {
         uc = memoryManager.uc;
         pathfind = new Pathfind(manager);
         aggressive = false;
+        exploring = false;
 
         // choose randomly one objective
         target = manager.startEnemies[(int)(Math.random()*manager.startEnemies.length)];
@@ -20,18 +21,20 @@ public class Attack {
 
     private Location myLocation;
     private boolean aggressive;
+    private boolean exploring;
     private Location nextForTarget;
 
     public void play() {
 
         myLocation = manager.myLocation;
 
-        if(manager.getWarriorsNum() > 20) {
+        if(manager.round > 400 && !exploring) {
             aggressive = true;
         }
 
-        if(myLocation.distanceSquared(target) < 25) {
+        if(myLocation.distanceSquared(target) < 10) {
             aggressive = false;
+            exploring = true;
         }
 
         tryAttackBestUnit();
@@ -111,7 +114,7 @@ public class Attack {
 
                 if(aggressive && nextForTarget != null &&
                         nextForTarget.isEqual(plocs[j])) {
-                    value += 3;
+                    value += 5;
                 }
 
             }

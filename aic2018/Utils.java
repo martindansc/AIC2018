@@ -92,7 +92,7 @@ public class Utils {
         int y1 = var1.y;
         int y2 = var2.y;
         int rise = y2 - y1;
-        int run = x2 - x1;;
+        int run = x2 - x1;
         if (run == 0) {
             if(y2 < y1) {
                 y1 = var2.y;
@@ -122,7 +122,7 @@ public class Utils {
                 }
                 for (int x = x1; x < x2; x++) {
                     Location newLoc = new Location(x, y);
-                    if (uc.senseWaterAtLocation(newLoc)) {
+                    if (uc.canSenseLocation(newLoc) && uc.senseWaterAtLocation(newLoc)) {
                         return true;
                     }
                     offset += delta;
@@ -142,7 +142,7 @@ public class Utils {
                 }
                 for (int y = y1; y < y2; y++) {
                     Location newLoc = new Location(x, y);
-                    if (uc.senseWaterAtLocation(newLoc)) {
+                    if (uc.canSenseLocation(newLoc) && uc.senseWaterAtLocation(newLoc)) {
                         return true;
                     }
                     offset += delta;
@@ -157,20 +157,26 @@ public class Utils {
     }
 
     public Boolean canPlantTree(MemoryManager manager) {
-        return manager.resources > 179 && manager.objective == UnitType.WORKER;
+        return manager.resources > 179 && (manager.objective == UnitType.WORKER || manager.resources > 700);
     }
 
     public Boolean canSpawnWorker(MemoryManager manager) {
-        return (manager.resources > 199 && manager.objective == UnitType.WORKER);
+        return (manager.resources > 199 && (manager.objective == UnitType.WORKER || manager.resources > 700));
     }
 
     public Boolean canSpawnBarraks(UnitInfo unit, MemoryManager manager) {
-        return (((unit.getTeam() == manager.opponent && manager.getBarracksNum() < 6) ||
-                manager.getBarracksNum() < 1) && manager.resources > 499);
+        return ((unit.getTeam() == manager.opponent && manager.getBarracksNum() < 6) && manager.resources > 499);
     }
 
     public Boolean canSpawnBarraks(MemoryManager manager) {
-        return manager.getBarracksNum() < 1 && manager.resources > 499;
+        boolean closeEnough = false;
+        for(Location enemyStart : manager.startEnemies) {
+            if(manager.distanceBetweenStarters * 0.5 > manager.myLocation.distanceSquared(enemyStart)) {
+                closeEnough = true;
+                break;
+            }
+        }
+        return manager.getBarracksNum() < 1 && manager.resources > 499 && closeEnough;
     }
 
 }

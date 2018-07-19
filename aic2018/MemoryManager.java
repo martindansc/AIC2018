@@ -13,6 +13,8 @@ public class MemoryManager {
     private int OBJECTIVE = 17;
     private int OBJECTIVE_COMPLETED = 18;
 
+    private int DISTANCE_STARTERS = 19;
+
     public UnitController uc;
 
     public boolean root;
@@ -21,6 +23,8 @@ public class MemoryManager {
     public Team allies;
     public Direction[] dirs;
     public Location[] startEnemies;
+
+    public Location starter;
 
     public int round;
     public int resources;
@@ -47,9 +51,11 @@ public class MemoryManager {
 
         distanceBetweenStarters = Integer.MAX_VALUE;
 
+        starter = allies.getInitialLocations()[0];
+
         startEnemies = uc.getTeam().getOpponent().getInitialLocations();
         for(Location startEnemy : startEnemies) {
-            int distance = myLocation.distanceSquared(startEnemy);
+            int distance = starter.distanceSquared(startEnemy);
             if(distanceBetweenStarters > distance) {
                 distanceBetweenStarters = distance;
             }
@@ -170,7 +176,7 @@ public class MemoryManager {
             if(round >= roundBarracks && getBarracksNum() + getBarracksConsNum() < 1) {
                 uc.write(OBJECTIVE, 1);
             }
-            else if(round < roundBarracks || Math.random()*1700 > round) {
+            else if(round < roundBarracks || Math.random()*1600 > round*2) {
                 uc.write(OBJECTIVE, 0);
             }
             else {
@@ -191,7 +197,7 @@ public class MemoryManager {
 
     private int randomPonderedUnit() {
         int num = (int)(Math.random()*100);
-        if(num < 60) return 2;
+        if(num < 100) return 2;
         else return 3;
     }
 

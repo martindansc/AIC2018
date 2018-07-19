@@ -161,7 +161,7 @@ public class Collect {
             }
         }
 
-        if (((treeCount == 8 && workerCount < 4) || (trees.length > (workerCount + 1) * 6) || (numOaks > workerCount + 1))
+        if (((treeCount > 7 && workerCount < 4) || (trees.length > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.5))
                 && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
