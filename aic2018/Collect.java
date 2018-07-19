@@ -115,6 +115,7 @@ public class Collect {
         if(utils.canPlantTree(manager) && (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canUseActiveAbility(locs[i]) ) {
+                    manager.objectiveCompleted();
                     uc.useActiveAbility(locs[i]);
                 }
             }
@@ -161,7 +162,7 @@ public class Collect {
             }
         }
 
-        if (((treeCount > 7 && workerCount < 4) || (trees.length > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.5))
+        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.3))
                 && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {

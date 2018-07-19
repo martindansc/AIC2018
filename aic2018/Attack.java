@@ -28,7 +28,7 @@ public class Attack {
 
         myLocation = manager.myLocation;
 
-        if(manager.round > 400 && !exploring) {
+        if(!exploring) {
             aggressive = true;
         }
 
