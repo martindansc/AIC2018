@@ -85,6 +85,8 @@ public class MemoryManager {
 
         if(root) rootUpdate();
 
+        if(enemies.length> 0) uc.write(AT_LEAST_ONE_ENEMY, 1);
+
         if(uc.getType() == UnitType.WORKER) {
             uc.write(3, uc.read(3) + 1);
         }
@@ -114,7 +116,7 @@ public class MemoryManager {
     }
 
     public int getEnemiesSeenLastRound() {
-        return 1;
+        return uc.read(ENEMIES_SEEN_LAST_ROUND);
     }
 
     public int getAtLeastOneEnemy() {
@@ -135,6 +137,8 @@ public class MemoryManager {
         // Updates warriors
         uc.write(7, uc.read(8));
         uc.write(8, 0);
+
+        uc.write(AT_LEAST_ONE_ENEMY, 0);
 
         // Updates barracks in construction
         for (int i = 20; i < 40; i = i + 2) {
@@ -162,7 +166,7 @@ public class MemoryManager {
 
 
         //update objective
-        if(uc.read(OBJECTIVE_COMPLETED) == 1) {
+        if(uc.read(OBJECTIVE_COMPLETED) == 1 && getAtLeastOneEnemy() == 0) {
             if(round >= roundBarracks && getBarracksNum() + getBarracksConsNum() < 1) {
                 uc.write(OBJECTIVE, 1);
             }
@@ -172,6 +176,10 @@ public class MemoryManager {
             else {
                 uc.write(OBJECTIVE, randomPonderedUnit());
             }
+            uc.write(OBJECTIVE_COMPLETED, 0);
+        }
+        else if(getAtLeastOneEnemy() > 0){
+            uc.write(OBJECTIVE, randomPonderedUnit());
             uc.write(OBJECTIVE_COMPLETED, 0);
         }
 
