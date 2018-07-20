@@ -157,15 +157,15 @@ public class Utils {
     }
 
     public Boolean canPlantTree(MemoryManager manager) {
-        return((manager.round < manager.roundBarracks && manager.resources > 199) || (manager.resources > 699 && manager.round > manager.roundBarracks));
+        return((manager.round < manager.roundBarracks && manager.resources > 199) || (manager.resources > 699 && manager.round >= manager.roundBarracks));
     }
 
     public Boolean canSpawnWorker(MemoryManager manager) {
-        return ((manager.resources > 199 && manager.round < manager.roundBarracks) || (manager.resources > 699 && manager.round > manager.roundBarracks));
+        return (((manager.resources > 199 && manager.round < manager.roundBarracks) || (manager.resources > 699 && manager.round >= manager.roundBarracks)) && (manager.getOAKS() == 1 || (manager.getNOT_FULL() == 1 && manager.getOAKS() == 0)));
     }
 
     public Boolean canSpawnBarracks(UnitInfo unit, MemoryManager manager) {
-        return (unit.getTeam() == manager.opponent && manager.getBarracksNum() < 6 && manager.resources > 499 && manager.round > 99);
+        return (unit.getTeam() == manager.opponent && manager.getBarracksNum() < 6 && manager.resources > 499 && manager.round >= manager.roundBarracks);
     }
 
     public Boolean canSpawnBarraks(MemoryManager manager) {

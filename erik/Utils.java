@@ -1,9 +1,6 @@
 package erik;
 
-import aic2018.Direction;
-import aic2018.GameConstants;
-import aic2018.Location;
-import aic2018.UnitController;
+import aic2018.*;
 
 public class Utils {
 

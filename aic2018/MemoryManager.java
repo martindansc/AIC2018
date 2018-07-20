@@ -13,7 +13,18 @@ public class MemoryManager {
     private int OBJECTIVE = 17;
     private int OBJECTIVE_COMPLETED = 18;
 
-    private int  LIMIT_GOLD_WORKERS = 19;
+    private int LIMIT_GOLD_WORKERS = 19;
+
+    private int OAKS = 20;
+    private int NOT_FULL = 21;
+
+    private int CLEARED1 = 22;
+    private int CLEARED2 = 23;
+    private int CLEARED3 = 24;
+    private int ENEMY_BASES = 25;
+
+    private int ENEMY_XLOC = 26;
+    private int ENEMY_YLOC = 27;
 
     public UnitController uc;
 
@@ -64,7 +75,7 @@ public class MemoryManager {
         }
 
         objective = UnitType.WORKER;
-        roundBarracks = Math.min(100, distanceBetweenStarters);
+        roundBarracks = 100;
     }
 
     public void update() {
@@ -95,7 +106,13 @@ public class MemoryManager {
 
         if(root) rootUpdate();
 
-        if(enemies.length> 0) uc.write(AT_LEAST_ONE_ENEMY, 1);
+        if(enemies.length > 0) {
+            uc.write(AT_LEAST_ONE_ENEMY, 1);
+            if (uc.read(ENEMY_XLOC) == 0 && uc.read(ENEMY_YLOC) == 0) {
+                uc.write(ENEMY_XLOC, enemies[0].getLocation().x);
+                uc.write(ENEMY_YLOC, enemies[0].getLocation().y);
+            }
+        }
 
         if(uc.getType() == UnitType.WORKER) {
             uc.write(3, uc.read(3) + 1);
@@ -133,6 +150,13 @@ public class MemoryManager {
         return uc.read(AT_LEAST_ONE_ENEMY);
     }
 
+    public int getOAKS() {
+        return uc.read(OAKS);
+    }
+    public int getNOT_FULL() {
+        return uc.read(NOT_FULL);
+    }
+
     // PRIVATE
 
     private void updateObjective() {
@@ -167,8 +191,21 @@ public class MemoryManager {
 
         uc.write(AT_LEAST_ONE_ENEMY, 0);
 
+        uc.write(20, 0);
+        uc.write(21, 1);
+
+        if (uc.read(ENEMY_BASES) == 0) {
+            uc.write(ENEMY_BASES, startEnemies.length);
+            if (startEnemies.length == 2) {
+                uc.write(CLEARED3,1);
+            }
+            if (startEnemies.length == 1) {
+                uc.write(CLEARED2,1);
+            }
+        }
+
         // Updates barracks in construction
-        for (int i = 20; i < 40; i = i + 2) {
+        for (int i = 60; i < 100; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 25) {
                     uc.write(6, uc.read(6) - 1);
@@ -180,7 +217,7 @@ public class MemoryManager {
         }
 
         // Updates warriors in construction
-        for (int i = 40; i < 100; i = i + 2) {
+        for (int i = 100; i < 200; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
                     uc.write(9, uc.read(9) - 1);

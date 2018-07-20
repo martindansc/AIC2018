@@ -32,7 +32,7 @@ public class Barracks {
 
                     // Updates warriors in construction
                     uc.write(9, uc.read(9) + 1);
-                    for (int j = 40; j < 100; j = j + 2) {
+                    for (int j = 100; j < 200; j = j + 2) {
                         if (uc.read(j) == 0) {
                             uc.write(j, uc.senseUnit(myLocation.add(manager.dirs[i])).getID());
                             break;

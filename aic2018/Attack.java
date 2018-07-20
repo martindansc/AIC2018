@@ -14,9 +14,6 @@ public class Attack {
         pathfind = new Pathfind(manager);
         aggressive = false;
         exploring = false;
-
-        // choose randomly one objective
-        target = manager.startEnemies[(int)(Math.random()*manager.startEnemies.length)];
     }
 
     private Location myLocation;
@@ -25,16 +22,45 @@ public class Attack {
     private Location nextForTarget;
 
     public void play() {
-
         myLocation = manager.myLocation;
 
-        if(!exploring) {
+        if (manager.getAtLeastOneEnemy() == 1) {
             aggressive = true;
         }
 
-        if(myLocation.distanceSquared(target) < 5) {
+        if (manager.enemies.length != 0) {
             aggressive = false;
-            exploring = true;
+        }
+
+        // choose one objective
+        /*
+        if (uc.read(22) == 0) {
+            target = manager.startEnemies[0];
+        } else if (uc.read(23) == 0) {
+            target = manager.startEnemies[1];
+        } else if (uc.read(24) == 0) {
+            target = manager.startEnemies[2];
+        }
+        */
+
+        Location newTarget = new Location(uc.read(26), uc.read(27));
+        target = newTarget;
+
+        for (int i = 0; i < manager.startEnemies.length; i++) {
+            if (myLocation.isEqual(manager.startEnemies[i]) && manager.enemies.length == 0) {
+                if (i == 0) {
+                    uc.write(22,1);
+                } else if (i == 1) {
+                    uc.write(23,1);
+                } else if (i == 2) {
+                    uc.write(24,1);
+                }
+            }
+        }
+
+        if (myLocation.isEqual(target) && manager.enemies.length == 0) {
+            uc.write(26,0);
+            uc.write(27,0);
         }
 
         tryAttackBestUnit();
@@ -73,15 +99,13 @@ public class Attack {
         for (int j = 0; j < plocs.length; j++) {
             float value = 0;
 
+            int numWorkers = 0;
+
             for (int i = 0; i < units.length; i++) {
                 UnitInfo currentUnit = units[i];
                 float distance = plocs[j].distanceSquared(currentUnit.getLocation());
                 Team unitTeam = currentUnit.getTeam();
                 UnitType unitType = currentUnit.getType();
-
-                if (utils.isExtreme(uc, plocs[j])) {
-                    value -= -1;
-                }
 
                 if(unitTeam != allies) {
                     if (unitType == UnitType.BARRACKS) {
@@ -94,18 +118,27 @@ public class Attack {
                         value += 100 / (1 + distance) - currentUnit.getHealth()/6;
                     }
                 }
-                else if(unitType != UnitType.BARRACKS
-                        && exploring){
+                else if(unitType != UnitType.WORKER && unitType != UnitType.BARRACKS){
                     if (distance <= 4) {
                         value -= 4;
                     } else if (distance < 10) {
-                        value -= 2;
+                        value -= 1;
                     }
                 }
+                else {
+                    numWorkers++;
+                }
 
-                if(aggressive && nextForTarget != null &&
-                        nextForTarget.isEqual(plocs[j])) {
-                    value += 5;
+                // stay at the front line
+                if(numWorkers > 3) {
+                    value -= 1;
+                }
+                else {
+                    value += 1;
+                }
+
+                if(nextForTarget != null && nextForTarget.isEqual(plocs[j])) {
+                    value += 3;
                 }
 
             }
@@ -146,6 +179,7 @@ public class Attack {
 
         return false;
     }
+
 
     public boolean tryAttackTree() {
         TreeInfo[] trees = manager.trees;
