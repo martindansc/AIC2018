@@ -157,7 +157,7 @@ public class Utils {
     }
 
     public Boolean canPlantTree(MemoryManager manager) {
-        return((manager.round < manager.roundBarracks && manager.resources > 199) || (manager.resources > 699 && manager.round >= manager.roundBarracks));
+        return((manager.round < manager.roundBarracks && manager.resources > 220) || (manager.resources > 699 && manager.round >= manager.roundBarracks));
     }
 
     public Boolean canSpawnWorker(MemoryManager manager) {

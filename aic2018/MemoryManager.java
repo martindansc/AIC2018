@@ -2,11 +2,11 @@ package aic2018;
 
 public class MemoryManager {
 
-    private int AMIROOT = 10;
-
     private int BARRACKS = 6;
 
-    private int ENEMIES_SEEN_LAST_ROUND = 15;
+    private int AMIROOT = 10;
+
+    private int ENEMIES = 14;
 
     private int AT_LEAST_ONE_ENEMY = 16;
 
@@ -74,7 +74,7 @@ public class MemoryManager {
             }
         }
 
-        objective = UnitType.WORKER;
+        objective = UnitType.WARRIOR;
         roundBarracks = 100;
     }
 
@@ -122,8 +122,34 @@ public class MemoryManager {
             uc.write(5, uc.read(5) + 1);
         }
 
-        int objective_val = uc.read(OBJECTIVE);
-        objective = UnitType.values()[objective_val];
+        if(uc.getType() == UnitType.WARRIOR) {
+            uc.write(8, uc.read(8) + 1);
+        }
+
+        if(uc.getType() == UnitType.ARCHER) {
+            uc.write(12, uc.read(12) + 1);
+        }
+
+        if(uc.getType() == UnitType.KNIGHT) {
+            uc.write(29, uc.read(29) + 1);
+        }
+
+        if(uc.getType() == UnitType.BALLISTA) {
+            uc.write(32, uc.read(32) + 1);
+        }
+
+        // Update unique enemies
+        for (int i = 0; i < enemies.length; i++) {
+            for (int j = 1000; j < 1500; j++) {
+                int ID = uc.read(j);
+                if (ID == 0) {
+                    uc.write(j, enemies[i].getID());
+                    break;
+                } else if (ID == enemies[i].getID()) {
+                    break;
+                }
+            }
+        }
     }
 
     public int getWorkersNum() {
@@ -131,11 +157,27 @@ public class MemoryManager {
     }
 
     public int getBarracksNum() {
-        return uc.read(4) + uc.read(6);
+        return uc.read(4) + getBarracksConsNum();
     }
 
     public int getWarriorsNum() {
         return uc.read(7) + uc.read(9);
+    }
+
+    public int getArchersNum() {
+        return uc.read(11) + uc.read(13);
+    }
+
+    public int getKnightsNum() {
+        return uc.read(28) + uc.read(30);
+    }
+
+    public int getBallistasNum() {
+        return uc.read(31) + uc.read(33);
+    }
+
+    public int getTotalTroops() {
+        return getWarriorsNum() + getArchersNum() + getKnightsNum() + getBallistasNum();
     }
 
     public int getBarracksConsNum() {
@@ -143,7 +185,7 @@ public class MemoryManager {
     }
 
     public int getEnemiesSeenLastRound() {
-        return uc.read(ENEMIES_SEEN_LAST_ROUND);
+        return uc.read(ENEMIES);
     }
 
     public int getAtLeastOneEnemy() {
@@ -160,20 +202,7 @@ public class MemoryManager {
     // PRIVATE
 
     private void updateObjective() {
-        //update objective
-        //if(uc.read(OBJECTIVE_COMPLETED) == 1) {
-            if(round >= roundBarracks && getBarracksNum() + getBarracksConsNum() < 1) {
-                uc.write(OBJECTIVE, 1);
-            }
-            else if(round < roundBarracks || getEnemiesSeenLastRound() > 0) {
-                uc.write(OBJECTIVE, 0);
-                uc.write(LIMIT_GOLD_WORKERS, Math.max(500, limitGoldWorkers));
-            }
-            else {
-                uc.write(OBJECTIVE, randomPonderedUnit());
-            }
-            uc.write(OBJECTIVE_COMPLETED, 0);
-        //}
+        // TODO
     }
 
     private void rootUpdate() {
@@ -188,6 +217,30 @@ public class MemoryManager {
         // Updates warriors
         uc.write(7, uc.read(8));
         uc.write(8, 0);
+
+        // Updates archers
+        uc.write(11, uc.read(12));
+        uc.write(12, 0);
+
+        // Updates knights
+        uc.write(28, uc.read(29));
+        uc.write(29, 0);
+
+        // Updates ballistas
+        uc.write(31, uc.read(32));
+        uc.write(32, 0);
+
+        // Update enemies
+        for (int j = 1000; j < 1500; j++) {
+            int ID = uc.read(j);
+            if (ID == 0) {
+                uc.write(ENEMIES, j - 1000);
+                break;
+            } else {
+                uc.write(j, 0);
+            }
+        }
+
 
         uc.write(AT_LEAST_ONE_ENEMY, 0);
 
@@ -228,9 +281,41 @@ public class MemoryManager {
             }
         }
 
-        updateObjective();
+        // Updates archers in construction
+        for (int i = 200; i < 300; i = i + 2) {
+            if (uc.read(i) != 0) {
+                if (uc.read(i + 1) == 5) {
+                    uc.write(13, uc.read(13) - 1);
+                    uc.write(i, 0);
+                    uc.write(i + 1, 0);
+                }
+                uc.write(i + 1, uc.read(i + 1) + 1);
+            }
+        }
 
+        // Updates knights in construction
+        for (int i = 300; i < 400; i = i + 2) {
+            if (uc.read(i) != 0) {
+                if (uc.read(i + 1) == 5) {
+                    uc.write(30, uc.read(30) - 1);
+                    uc.write(i, 0);
+                    uc.write(i + 1, 0);
+                }
+                uc.write(i + 1, uc.read(i + 1) + 1);
+            }
+        }
 
+        // Updates ballistas in construction
+        for (int i = 400; i < 500; i = i + 2) {
+            if (uc.read(i) != 0) {
+                if (uc.read(i + 1) == 5) {
+                    uc.write(33, uc.read(33) - 1);
+                    uc.write(i, 0);
+                    uc.write(i + 1, 0);
+                }
+                uc.write(i + 1, uc.read(i + 1) + 1);
+            }
+        }
     }
 
     public void objectiveCompleted() {

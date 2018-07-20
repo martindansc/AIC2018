@@ -193,7 +193,4 @@ public class Attack {
 
         return false;
     }
-
-
-
 }
