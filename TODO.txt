@@ -1,12 +1,12 @@
-- Improve worker spawn
-- Workers harvest their location (possible?)
-- Archer count
-- Enemy count
+- Improve worker spawn (done)
+- Workers harvest their location (not possible)
+- Archer count (done)
+- Enemy count (done)
 - Attack function
 - Spawn soldiers and barracks proportionally to the enemies seen and our workers and resources
 - Improve soldiers gravity
 	- Towards enemy seen by units (archers keep distance)
-	- Towards a random enemy seen by others
+	- Towards a random enemy seen by others (done)
 	- If no enemies seen:
 		- Towards enemy base
 		- Towards a random, not visible location inside the map (needs next function)
