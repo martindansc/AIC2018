@@ -58,9 +58,25 @@ public class Attack {
             }
         }
 
+        /*
         if (myLocation.isEqual(target) && manager.enemies.length == 0) {
             uc.write(26,0);
             uc.write(27,0);
+        }
+        */
+
+        // TODO improve retargetting somehow
+        if (uc.canSenseLocation(target)) {
+            UnitInfo targetUnit = uc.senseUnit(target);
+            if (targetUnit == null || targetUnit.getTeam() == manager.allies) {
+                if (manager.enemies.length != 0) {
+                    uc.write(26, manager.enemies[0].getLocation().x);
+                    uc.write(27, manager.enemies[0].getLocation().y);
+                } else {
+                    uc.write(26, 0);
+                    uc.write(27, 0);
+                }
+            }
         }
 
         tryAttackBestUnit();
