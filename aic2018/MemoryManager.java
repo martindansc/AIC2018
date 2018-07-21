@@ -88,7 +88,7 @@ public class MemoryManager {
             }
         }
 
-        objective = UnitType.WARRIOR;
+        objective = UnitType.WORKER;
         roundBarracks = 100;
     }
 
@@ -131,6 +131,9 @@ public class MemoryManager {
 
         if (uc.read(AT_LEAST_ONE_ENEMY) == 1) {
             roundBarracks = round;
+
+            // offense mode
+            if(objective == UnitType.WORKER) decideNextUnitType();
         }
 
         if(uc.getType() == UnitType.WORKER) {
@@ -219,10 +222,6 @@ public class MemoryManager {
     }
 
     // PRIVATE
-
-    private void updateObjective() {
-        // TODO
-    }
 
     private void rootUpdate() {
         // Updates workers
@@ -342,6 +341,7 @@ public class MemoryManager {
                 uc.write(i + 1, uc.read(i + 1) + 1);
             }
         }
+
     }
 
     public void objectiveCompleted() {
@@ -352,10 +352,19 @@ public class MemoryManager {
         return uc.read(OBJECTIVE_COMPLETED) == 1;
     }
 
-    private int randomPonderedUnit() {
-        int num = (int)(Math.random()*100);
-        if(num < 100) return 2;
-        else return 3;
+    public void decideNextUnitType() {
+        int totalTroops = getTotalTroops() + 1;
+
+        // from offensive to farms
+        if(totalTroops > getEnemiesSeenLastRound() * 3 || getWorkersNum() < 4) {
+            objective = UnitType.WORKER;
+        }
+        else {
+            if(totalTroops > 50 && getBallistasNum() < 1) objective = UnitType.BALLISTA;
+            else if(getWarriorsNum()*10/totalTroops <= 4) objective = UnitType.WARRIOR;
+            else if(getArchersNum()*10/totalTroops <= 3) objective = UnitType.ARCHER;
+            else if(getKnightsNum()*10/totalTroops <= 3) objective = UnitType.KNIGHT;
+        }
     }
 
 }

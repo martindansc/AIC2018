@@ -4,23 +4,24 @@ public class Barracks {
 
     private MemoryManager manager;
     private UnitController uc;
-    private Utils utils = new Utils();
 
     public Barracks(MemoryManager memoryManager) {
         this.manager = memoryManager;
         uc = memoryManager.uc;
 
-        typeIndex = (int)(Math.random()*1);
+        if(manager.objective == UnitType.WORKER) {
+            manager.decideNextUnitType();
+        }
     }
 
-    int typeIndex;
     private Location myLocation;
 
     public void play() {
 
         myLocation = manager.myLocation;
-        int totalTroops = manager.getTotalTroops();
-        if (totalTroops < manager.getEnemiesSeenLastRound() * 5) {
+
+        if (manager.objective != UnitType.WORKER) {
+
             for (int i = 0; i < 8; ++i) {
                 if (uc.canSpawn(manager.dirs[i], manager.objective)) {
                     uc.spawn(manager.dirs[i], manager.objective);
@@ -68,6 +69,8 @@ public class Barracks {
                             }
                         }
                     }
+
+                    manager.decideNextUnitType();
                 }
             }
         }

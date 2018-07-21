@@ -109,8 +109,6 @@ public class Attack {
         for (int j = 0; j < plocs.length; j++) {
             float value = 0;
 
-            int numWorkers = 0;
-
             for (int i = 0; i < units.length; i++) {
                 UnitInfo currentUnit = units[i];
                 float distance = plocs[j].distanceSquared(currentUnit.getLocation());
@@ -118,34 +116,49 @@ public class Attack {
                 UnitType unitType = currentUnit.getType();
 
                 if(unitTeam != allies) {
-                    if (unitType == UnitType.BARRACKS) {
-                        value += 8 / (1 + distance) - currentUnit.getHealth()/6;
+                    if(manager.type == UnitType.ARCHER){
+                        if (unitType == UnitType.BARRACKS) {
+                            value -= 3 / (1 + distance);
+                        } else if (unitType == UnitType.WORKER) {
+                            value += 10 / (1 + distance) - currentUnit.getHealth() / 6;
+                        } else if(distance <= GameConstants.ARCHER_ATTACK_RANGE_SQUARED){
+                            value -= 100 / (1 + distance);
+                        }
+                        else {
+                            value += 2;
+                        }
                     }
-                    else if(unitType == UnitType.WORKER) {
-                        value += 16 / (1 + distance) - currentUnit.getHealth()/6;
+                    else if(manager.type == UnitType.BALLISTA) {
+                        if (unitType == UnitType.BARRACKS) {
+                            value -= 3 / (1 + distance);
+                        } else if (unitType == UnitType.WORKER) {
+                            value += 10 / (1 + distance) - currentUnit.getHealth() / 6;
+                        } else if(distance <= GameConstants.BALLISTA_ATTACK_RANGE_SQUARED){
+                            value -= 100 / (1 + distance);
+                        }
+                        else {
+                            value += 2;
+                        }
                     }
                     else {
-                        value += 100 / (1 + distance) - currentUnit.getHealth()/6;
+                        if (unitType == UnitType.BARRACKS) {
+                            value += 16 / (1 + distance) - currentUnit.getHealth() / 6;
+                        } else if (unitType == UnitType.WORKER) {
+                            value += 8 / (1 + distance) - currentUnit.getHealth() / 6;
+                        } else {
+                            value += 100 / (1 + distance) - currentUnit.getHealth() / 6;
+                        }
                     }
+
                 }
-                else if(unitType != UnitType.WORKER && unitType != UnitType.BARRACKS){
+                else if(unitType != UnitType.WORKER && unitType != UnitType.BARRACKS && exploring){
                     if (distance <= 4) {
-                        value -= 4;
+                        value -= 3;
                     } else if (distance < 10) {
                         value -= 1;
                     }
                 }
-                else {
-                    numWorkers++;
-                }
 
-                // stay at the front line
-                if(numWorkers > 3) {
-                    value -= 1;
-                }
-                else {
-                    value += 1;
-                }
 
                 if(nextForTarget != null && nextForTarget.isEqual(plocs[j])) {
                     value += 3;
@@ -168,6 +181,9 @@ public class Attack {
     }
 
     public boolean tryAttackBestUnit() {
+
+        if(!uc.canAttack()) return false;
+
         int myLevel = uc.getLevel();
         int myAttack = 0;
         int warriorPassive = 0;
