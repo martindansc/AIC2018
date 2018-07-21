@@ -12,7 +12,7 @@ public class MemoryManager {
     public int WARRIORS_PREVIOUS = 7;
     public int WARRIORS_CURRENT = 8;
     public int WARRIORS_CONSTRUCTION = 9;
-    public int AMIROOT = 10;
+    public int BARRACKS_ROUND = 10;
     public int ARCHERS_PREVIOUS = 11;
     public int ARCHERS_CURRENT = 12;
     public int ARCHERS_CONSTRUCTION = 13;
@@ -63,7 +63,7 @@ public class MemoryManager {
 
     UnitType objective;
 
-    int roundBarracks;
+    int roundBarracks = 100;
 
     public MemoryManager(UnitController uc) {
         this.uc = uc;
@@ -89,7 +89,6 @@ public class MemoryManager {
         }
 
         objective = UnitType.WARRIOR;
-        roundBarracks = 100;
     }
 
     public void update() {
@@ -129,8 +128,8 @@ public class MemoryManager {
             }
         }
 
-        if (uc.read(AT_LEAST_ONE_ENEMY) == 1) {
-            roundBarracks = round;
+        if (uc.read(AT_LEAST_ONE_ENEMY) == 1 && uc.read(BARRACKS_ROUND) == 0) {
+            uc.write(BARRACKS_ROUND, round);
         }
 
         if(uc.getType() == UnitType.WORKER) {
@@ -218,6 +217,15 @@ public class MemoryManager {
         return uc.read(NOT_FULL);
     }
 
+    public int getBarracksRound() {
+        int barracksRound = uc.read(BARRACKS_ROUND);
+        if (barracksRound == 0) {
+            return roundBarracks;
+        } else {
+            return barracksRound;
+        }
+    }
+
     // PRIVATE
 
     private void updateObjective() {
@@ -296,7 +304,7 @@ public class MemoryManager {
         }
 
         // Updates warriors in construction
-        for (int i = 100; i < 200; i = i + 2) {
+        for (int i = 100; i < 140; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
                     uc.write(WARRIORS_CONSTRUCTION, uc.read(WARRIORS_CONSTRUCTION) - 1);
@@ -308,7 +316,7 @@ public class MemoryManager {
         }
 
         // Updates archers in construction
-        for (int i = 200; i < 300; i = i + 2) {
+        for (int i = 200; i < 240; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
                     uc.write(ARCHERS_CONSTRUCTION, uc.read(ARCHERS_CONSTRUCTION) - 1);
@@ -320,7 +328,7 @@ public class MemoryManager {
         }
 
         // Updates knights in construction
-        for (int i = 300; i < 400; i = i + 2) {
+        for (int i = 300; i < 340; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
                     uc.write(KNIGHTS_CONSTRUCTION, uc.read(KNIGHTS_CONSTRUCTION) - 1);
@@ -332,7 +340,7 @@ public class MemoryManager {
         }
 
         // Updates ballistas in construction
-        for (int i = 400; i < 500; i = i + 2) {
+        for (int i = 400; i < 440; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
                     uc.write(BALLISTAS_CONSTRUCTION, uc.read(BALLISTAS_CONSTRUCTION) - 1);

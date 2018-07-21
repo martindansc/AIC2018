@@ -168,8 +168,7 @@ public class Collect {
 
     public void spawnIfNeeded(int treeCount) {
         checkForSpawn();
-        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.3 && oakHealth / ((workerCount + 1) * 4) > 400))
-                && utils.canSpawnWorker(manager)) {
+        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.3 && oakHealth / ((workerCount + 1) * 4) > 400)) && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
                     uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
@@ -199,7 +198,7 @@ public class Collect {
                 value -= 50000;
             }
 
-            value -= 10000*utils.isExtreme(uc, locs[j]);
+            value -= 10000 * utils.isExtreme(uc, locs[j]);
 
             for (int i = 0; i < ctrees.length; i++) {
                 TreeInfo currentTree = ctrees[i];

@@ -32,24 +32,27 @@ public class Attack {
             aggressive = false;
         }
 
-        /*
+
         // choose one base as objective (can be implemented for when no enemies are seen)
-        if (uc.read(manager.CLEARED1) == 0) {
-            target = manager.startEnemies[0];
-        } else if (uc.read(manager.CLEARED2) == 0) {
-            target = manager.startEnemies[1];
-        } else if (uc.read(manager.CLEARED3) == 0) {
-            target = manager.startEnemies[2];
-        }
-        */
-
-        Location newTarget = new Location(uc.read(manager.ENEMY_XLOC), uc.read(manager.ENEMY_YLOC));
-
-        if ((myLocation.isEqual(newTarget) && uc.read(manager.ENEMY_ID) == 0) || uc.read(manager.RETARGET) == 1) {
-            uc.write(manager.RETARGET, 1);
-            target = null;
+        if (manager.getAtLeastOneEnemy() == 0) {
+            if (uc.read(manager.CLEARED1) == 0) {
+                target = manager.startEnemies[0];
+            } else if (uc.read(manager.CLEARED2) == 0) {
+                target = manager.startEnemies[1];
+            } else if (uc.read(manager.CLEARED3) == 0) {
+                target = manager.startEnemies[2];
+            } else {
+                target = null;
+                aggressive = false;
+            }
         } else {
-            target = newTarget;
+            Location newTarget = new Location(uc.read(manager.ENEMY_XLOC), uc.read(manager.ENEMY_YLOC));
+            if ((myLocation.isEqual(newTarget) && uc.read(manager.ENEMY_ID) == 0) || uc.read(manager.RETARGET) == 1) {
+                uc.write(manager.RETARGET, 1);
+                target = null;
+            } else {
+                target = newTarget;
+            }
         }
 
         for (int i = 0; i < manager.startEnemies.length; i++) {
@@ -217,9 +220,39 @@ public class Attack {
         int bestTargetHealth = 0;
         UnitInfo killableTarget = null;
         int killableTargetHealth = 0;
+        UnitInfo counter = null;
+        UnitType counterType = null;
+        int level = 0;
         if (manager.type == UnitType.WARRIOR && passive) {
             for (int i = 0; i < enemies.length; i++) {
+                UnitType enemyType = enemies[i].getType();
                 int health = enemies[i].getHealth();
+                if (uc.canUseActiveAbility() && enemyType != UnitType.BARRACKS && enemyType != UnitType.WORKER) {
+                    if (counter == null) {
+                        counter = enemies[i];
+                        counterType = enemyType;
+                        level = enemies[i].getLevel();
+                    } else if (enemyType == UnitType.KNIGHT && counterType != UnitType.KNIGHT) {
+                        counter = enemies[i];
+                        counterType = enemyType;
+                        level = enemies[i].getLevel();
+                    } else if (enemyType == UnitType.WARRIOR && counterType != UnitType.WARRIOR && counterType != UnitType.KNIGHT) {
+                        counter = enemies[i];
+                        counterType = enemyType;
+                        level = enemies[i].getLevel();
+                    } else if (enemyType == UnitType.ARCHER && counterType == UnitType.BALLISTA) {
+                        counter = enemies[i];
+                        counterType = enemyType;
+                        level = enemies[i].getLevel();
+                    } else if (enemyType == UnitType.BALLISTA && counterType != UnitType.BALLISTA) {
+                        counter = enemies[i];
+                        counterType = enemyType;
+                        level = enemies[i].getLevel();
+                    } else if (enemyType == counterType && level < enemies[i].getLevel()) {
+                        counter = enemies[i];
+                        level = enemies[i].getLevel();
+                    }
+                }
                 if (myLocation.distanceSquared(enemies[i].getLocation()) <= 2) {
                     if (bestTargetHealth < health) {
                         bestTarget = enemies[i];

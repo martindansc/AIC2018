@@ -1,6 +1,6 @@
 Soldier attack logic steps:
 - Initialize my dmg according to my level and my active ability (done)
-- Check for unit with highest health that can be killed (done wiwhout active)
+- Check for unit with highest health that can be killed (done)
 - If the final chosen unit to attack dies also without the active ability, don't use it.
 - In case that there is a tie and the unit can be killed, check for attack cooldown and choose the one that can attack next turn.
 - In case of tie, choose the highest damaging unit.
