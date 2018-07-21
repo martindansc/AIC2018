@@ -88,12 +88,7 @@ public class MemoryManager {
             }
         }
 
-<<<<<<< HEAD
         objective = UnitType.WORKER;
-        roundBarracks = 100;
-=======
-        objective = UnitType.WARRIOR;
->>>>>>> 389455f75f9f930270b3314820904c295e793986
     }
 
     public void update() {
