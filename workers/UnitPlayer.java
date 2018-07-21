@@ -30,6 +30,7 @@ public class UnitPlayer {
                         }
                     }
                     if (actAsSoldier) {
+                        collect.checkForSpawn();
                         attack.play();
                     } else {
                         collect.play();

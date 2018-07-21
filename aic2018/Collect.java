@@ -1,4 +1,6 @@
-package aic2018;
+package workers;
+
+import aic2018.*;
 
 public class Collect {
 
@@ -56,7 +58,7 @@ public class Collect {
         senseOaks();
         senseSmalls();
         countWorkers();
-        if (numOaks > (workerCount + 1) * 1.6 && oakHealth / ((workerCount + 1) * 4) > 250) {
+        if (numOaks > (workerCount + 1) * 1 && oakHealth / ((workerCount + 1) * 4) > 300) {
             uc.write(manager.OAKS, 1);
         }
         if (unaccessible + numAdjacentTrees < 7) {
@@ -147,7 +149,7 @@ public class Collect {
         }
     }
 
-    private void spwanBarracks(Direction dir) {
+    private void spawnBarracks(Direction dir) {
         uc.spawn(dir, UnitType.BARRACKS);
 
         // Updates barracks in construction
@@ -160,20 +162,24 @@ public class Collect {
         }
     }
 
-    public void spawnIfNeeded(int treeCount) {
-
+    public void checkForSpawn() {
         for (int j = 0; j < units.length; j++) {
             if (utils.canSpawnBarracks(units[j], manager)) {
                 for (int k = 0; k < 8; k++) {
                     if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
-                        spwanBarracks(manager.dirs[k]);
+                        spawnBarracks(manager.dirs[k]);
                         break;
                     }
                 }
             }
         }
+    }
 
-        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.6 && oakHealth / ((workerCount + 1) * 4) > 250))
+    public void spawnIfNeeded(int treeCount) {
+
+        checkForSpawn();
+
+        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1 && oakHealth / ((workerCount + 1) * 4) > 300))
                 && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
@@ -210,12 +216,15 @@ public class Collect {
             }
 
             for (int i = 0; i < trees.length; i++) {
+                if (uc.getEnergyLeft() < 6000) {
+                    break;
+                }
                 TreeInfo currentTree = trees[i];
                 int distance = locs[j].distanceSquared(currentTree.location);
                 if (currentTree.oak && distance != 0) {
                     value += 64000 / (distance * distance);
                 } else if (distance != 0) {
-                    value += 2000 / (distance * distance);
+                    value += 4000 / (distance * distance);
                 }
             }
 
