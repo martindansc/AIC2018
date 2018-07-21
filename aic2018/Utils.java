@@ -1,6 +1,5 @@
 package aic2018;
 
-
 public class Utils {
 
     public void buyPointsIfNeeded(UnitController uc) {
@@ -156,7 +155,7 @@ public class Utils {
     }
 
     public Boolean canSpawnWorker(MemoryManager manager) {
-        return (((manager.resources > 199 && manager.round < manager.roundBarracks) || (manager.resources > 699 && manager.round >= manager.roundBarracks)) && (manager.getOAKS() == 1 || (manager.getNOT_FULL() == 1 && manager.getOAKS() == 0)));
+        return (((manager.resources > 199 && manager.round < manager.roundBarracks) || (manager.resources > 699 && manager.round >= manager.roundBarracks)) && (manager.getOAKS() == 1 || (manager.getNOT_FULL() == 0 && manager.getOAKS() == 0)));
     }
 
     public Boolean canSpawnBarracks(UnitInfo unit, MemoryManager manager) {

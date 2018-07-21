@@ -55,11 +55,11 @@ public class Collect {
         countTrees();
         senseOaks();
         countWorkers();
-        if (numOaks > (workerCount + 1) * 1 && oakHealth / ((workerCount + 1) * 4) > 300) {
+        if (numOaks > (workerCount + 1) * 1.3 && oakHealth / ((workerCount + 1) * 4) > 400) {
             uc.write(manager.OAKS, 1);
         }
         if (unaccessible + numAdjacentTrees < 7) {
-            uc.write(manager.NOT_FULL, 0);
+            uc.write(manager.NOT_FULL, 1);
         }
         spawnIfNeeded(numAdjacentTrees);
         plantIfNeeded();
@@ -78,7 +78,7 @@ public class Collect {
 
     public void countTrees() {
         for (int i = 0; i < locs.length; i++) {
-            if (!uc.isAccessible(locs[i])) {
+            if (uc.senseWaterAtLocation(locs[i])) {
                 unaccessible++;
             }
             TreeInfo newTree = uc.senseTree(locs[i]);
@@ -89,23 +89,21 @@ public class Collect {
     }
 
     public void senseOaks() {
-        for (int i = 0; i < trees.length; i++) {
 
+        for (int i = 0; i < trees.length; i++) {
             if (trees[i].oak == false) {
                 numSmalls++;
-            }
+            } else {
 
-            if (uc.getEnergyLeft() < 3000) {
-                continue;
-            }
+                if (uc.getEnergyLeft() < 3000) {
+                    continue;
+                }
 
-            boolean water = utils.isObstructedWater(uc, myLocation, trees[i].location);
-            if (water) {
-                break;
-            }
-            if (trees[i].oak == true && !water) {
-                numOaks++;
-                oakHealth += trees[i].health;
+                boolean water = utils.isObstructedWater(uc, myLocation, trees[i].location);
+                if (!water) {
+                    numOaks++;
+                    oakHealth += trees[i].health;
+                }
             }
         }
     }
@@ -169,15 +167,13 @@ public class Collect {
     }
 
     public void spawnIfNeeded(int treeCount) {
-
         checkForSpawn();
-
-        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1 && oakHealth / ((workerCount + 1) * 4) > 300))
+        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.3 && oakHealth / ((workerCount + 1) * 4) > 400))
                 && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
-                        uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
-                        break;
+                    uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
+                    break;
                 }
             }
         }
@@ -206,15 +202,12 @@ public class Collect {
             value -= 10000*utils.isExtreme(uc, locs[j]);
 
             for (int i = 0; i < ctrees.length; i++) {
-                if (uc.getEnergyLeft() < 6000) {
-                    break;
-                }
                 TreeInfo currentTree = ctrees[i];
                 int distance = locs[j].distanceSquared(currentTree.location);
                 if (currentTree.oak && distance != 0) {
                     value += 64000 / (distance * distance);
                 } else if (distance != 0) {
-                    value += 4000 / (distance * distance);
+                    value += 2000 / (distance * distance);
                 }
             }
 

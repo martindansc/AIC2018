@@ -144,7 +144,7 @@ public class Collect {
         }
     }
 
-    private void spwanBarracks(Direction dir) {
+    private void spawnBarracks(Direction dir) {
         uc.spawn(dir, UnitType.BARRACKS);
 
         // Updates barracks in construction
@@ -157,25 +157,27 @@ public class Collect {
         }
     }
 
-    public void spawnIfNeeded(int treeCount) {
-
+    public void checkForSpawn() {
         for (int j = 0; j < units.length; j++) {
             if (utils.canSpawnBarracks(units[j], manager)) {
                 for (int k = 0; k < 8; k++) {
                     if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
-                        spwanBarracks(manager.dirs[k]);
+                        spawnBarracks(manager.dirs[k]);
                         break;
                     }
                 }
             }
         }
+    }
 
+    public void spawnIfNeeded(int treeCount) {
+        checkForSpawn();
         if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.6 && oakHealth / ((workerCount + 1) * 4) > 250))
                 && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
-                        uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
-                        break;
+                    uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
+                    break;
                 }
             }
         }

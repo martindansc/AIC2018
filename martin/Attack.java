@@ -215,12 +215,35 @@ public class Attack {
         UnitInfo[] enemies = manager.enemies;
         if(enemies.length == 0 || !uc.canAttack()) return false;
 
+        UnitInfo bestTarget = null;
+        int bestTargetHealth = 0;
+        UnitInfo killableTarget = null;
+        int killableTargetHealth = 0;
+        if (manager.type == UnitType.WARRIOR && passive) {
+            for (int i = 0; i < enemies.length; i++) {
+                int health = enemies[i].getHealth();
+                if (myLocation.distanceSquared(enemies[i].getLocation()) <= 2) {
+                    if (bestTargetHealth < health) {
+                        bestTarget = enemies[i];
+                        bestTargetHealth = health;
+                    }
+                    if (warriorPassive >= health && killableTargetHealth < health) {
+                        killableTarget = enemies[i];
+                        killableTargetHealth = health;
+                    }
+                }
+            }
+            if (killableTarget != null) {
+                uc.attack(killableTarget);
+                return true;
+            } else if (bestTarget != null) {
+                uc.attack(bestTarget);
+                return true;
+            }
+        }
+
         UnitInfo enemy = enemies[0];
         int maxHealth = 10001;
-
-        if (manager.type == UnitType.WARRIOR && passive) {
-            Location myMoves[] = utils.getPosibleMoves(uc);
-        }
 
         for (UnitInfo unit : enemies){
             int enemyHealth = unit.getHealth();

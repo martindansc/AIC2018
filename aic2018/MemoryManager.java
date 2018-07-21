@@ -271,7 +271,7 @@ public class MemoryManager {
         uc.write(AT_LEAST_ONE_ENEMY, 0);
 
         uc.write(OAKS, 0);
-        uc.write(NOT_FULL, 1);
+        uc.write(NOT_FULL, 0);
 
         if (uc.read(ENEMY_BASES) == 0) {
             uc.write(ENEMY_BASES, startEnemies.length);
