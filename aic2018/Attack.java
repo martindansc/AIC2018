@@ -66,16 +66,11 @@ public class Attack {
         */
 
         // TODO improve retargetting somehow
-        if (uc.canSenseLocation(target)) {
-            UnitInfo targetUnit = uc.senseUnit(target);
-            if (targetUnit == null || targetUnit.getTeam() == manager.allies) {
-                if (manager.enemies.length != 0) {
-                    uc.write(26, manager.enemies[0].getLocation().x);
-                    uc.write(27, manager.enemies[0].getLocation().y);
-                } else {
-                    uc.write(26, 0);
-                    uc.write(27, 0);
-                }
+        if (uc.read(15) == 0) {
+            if (manager.enemies.length != 0) {
+                uc.write(15, manager.enemies[0].getID());
+                uc.write(26, manager.enemies[0].getLocation().x);
+                uc.write(27, manager.enemies[0].getLocation().y);
             }
         }
 

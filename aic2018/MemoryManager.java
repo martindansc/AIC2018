@@ -8,6 +8,8 @@ public class MemoryManager {
 
     private int ENEMIES = 14;
 
+    private int ENEMY_ID = 15;
+
     private int AT_LEAST_ONE_ENEMY = 16;
 
     private int OBJECTIVE = 17;
@@ -111,6 +113,7 @@ public class MemoryManager {
             if (uc.read(ENEMY_XLOC) == 0 && uc.read(ENEMY_YLOC) == 0) {
                 uc.write(ENEMY_XLOC, enemies[0].getLocation().x);
                 uc.write(ENEMY_YLOC, enemies[0].getLocation().y);
+                uc.write(ENEMY_ID, enemies[0].getID());
             }
         }
 
@@ -231,6 +234,8 @@ public class MemoryManager {
         uc.write(32, 0);
 
         // Update enemies
+        boolean foundID = false;
+        int enemyID = uc.read(ENEMY_ID);
         for (int j = 1000; j < 1500; j++) {
             int ID = uc.read(j);
             if (ID == 0) {
@@ -239,6 +244,14 @@ public class MemoryManager {
             } else {
                 uc.write(j, 0);
             }
+            if (ID == enemyID) {
+                foundID = true;
+            }
+        }
+        if (!foundID) {
+            uc.write(ENEMY_ID, 0);
+            uc.write(ENEMY_XLOC, 0);
+            uc.write(ENEMY_YLOC, 0);
         }
 
 
