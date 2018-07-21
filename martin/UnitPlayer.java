@@ -1,11 +1,6 @@
 package martin;
 
-import aic2018.Attack;
-import aic2018.Barracks;
-import aic2018.Collect;
-import aic2018.MemoryManager;
 import aic2018.*;
-import aic2018.Utils;
 
 public class UnitPlayer {
 
