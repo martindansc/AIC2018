@@ -27,7 +27,7 @@ public class Barracks {
 
                     // Updates warriors in construction
                     if (manager.objective == UnitType.WARRIOR) {
-                        uc.write(9, uc.read(9) + 1);
+                        uc.write(manager.WARRIORS_CONSTRUCTION, uc.read(manager.WARRIORS_CONSTRUCTION) + 1);
                         for (int j = 100; j < 200; j = j + 2) {
                             if (uc.read(j) == 0) {
                                 uc.write(j, uc.senseUnit(myLocation.add(manager.dirs[i])).getID());
@@ -38,7 +38,7 @@ public class Barracks {
 
                     // Updates archers in construction
                     if (manager.objective == UnitType.ARCHER) {
-                        uc.write(13, uc.read(13) + 1);
+                        uc.write(manager.ARCHERS_CONSTRUCTION, uc.read(manager.ARCHERS_CONSTRUCTION) + 1);
                         for (int j = 200; j < 300; j = j + 2) {
                             if (uc.read(j) == 0) {
                                 uc.write(j, uc.senseUnit(myLocation.add(manager.dirs[i])).getID());
@@ -49,7 +49,7 @@ public class Barracks {
 
                     // Updates knights in construction
                     if (manager.objective == UnitType.KNIGHT) {
-                        uc.write(30, uc.read(30) + 1);
+                        uc.write(manager.KNIGHTS_CONSTRUCTION, uc.read(manager.KNIGHTS_CONSTRUCTION) + 1);
                         for (int j = 300; j < 400; j = j + 2) {
                             if (uc.read(j) == 0) {
                                 uc.write(j, uc.senseUnit(myLocation.add(manager.dirs[i])).getID());
@@ -60,7 +60,7 @@ public class Barracks {
 
                     // Updates knights in construction
                     if (manager.objective == UnitType.BALLISTA) {
-                        uc.write(33, uc.read(33) + 1);
+                        uc.write(manager.BALLISTAS_CONSTRUCTION, uc.read(manager.BALLISTAS_CONSTRUCTION) + 1);
                         for (int j = 400; j < 500; j = j + 2) {
                             if (uc.read(j) == 0) {
                                 uc.write(j, uc.senseUnit(myLocation.add(manager.dirs[i])).getID());

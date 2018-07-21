@@ -2,33 +2,41 @@ package aic2018;
 
 public class MemoryManager {
 
-    private int BARRACKS = 6;
-
-    private int AMIROOT = 10;
-
-    private int ENEMIES = 14;
-
-    private int ENEMY_ID = 15;
-
-    private int AT_LEAST_ONE_ENEMY = 16;
-
-    private int OBJECTIVE = 17;
-    private int OBJECTIVE_COMPLETED = 18;
-
-    private int LIMIT_GOLD_WORKERS = 19;
-
-    private int OAKS = 20;
-    private int NOT_FULL = 21;
-
-    private int CLEARED1 = 22;
-    private int CLEARED2 = 23;
-    private int CLEARED3 = 24;
-    private int ENEMY_BASES = 25;
-
-    private int ENEMY_XLOC = 26;
-    private int ENEMY_YLOC = 27;
-
-    private int RETARGET = 34;
+    public int PREVIOUS_ROUND = 0;
+    public int CURRENT_ROUND = 1;
+    public int WORKERS_PREVIOUS = 2;
+    public int WORKERS_CURRENT = 3;
+    public int BARRACKS_PREVIOUS = 4;
+    public int BARRACKS_CURRENT = 5;
+    public int BARRACKS_CONSTRUCTION = 6;
+    public int WARRIORS_PREVIOUS = 7;
+    public int WARRIORS_CURRENT = 8;
+    public int WARRIORS_CONSTRUCTION = 9;
+    public int AMIROOT = 10;
+    public int ARCHERS_PREVIOUS = 11;
+    public int ARCHERS_CURRENT = 12;
+    public int ARCHERS_CONSTRUCTION = 13;
+    public int ENEMIES = 14;
+    public int ENEMY_ID = 15;
+    public int AT_LEAST_ONE_ENEMY = 16;
+    public int OBJECTIVE = 17;
+    public int OBJECTIVE_COMPLETED = 18;
+    public int LIMIT_GOLD_WORKERS = 19;
+    public int OAKS = 20;
+    public int NOT_FULL = 21;
+    public int CLEARED1 = 22;
+    public int CLEARED2 = 23;
+    public int CLEARED3 = 24;
+    public int ENEMY_BASES = 25;
+    public int ENEMY_XLOC = 26;
+    public int ENEMY_YLOC = 27;
+    public int KNIGHTS_PREVIOUS = 28;
+    public int KNIGHTS_CURRENT = 29;
+    public int KNIGHTS_CONSTRUCTION = 30;
+    public int BALLISTAS_PREVIOUS = 31;
+    public int BALLISTAS_CURRENT = 32;
+    public int BALLISTAS_CONSTRUCTION = 33;
+    public int RETARGET = 34;
 
     public UnitController uc;
 
@@ -93,20 +101,19 @@ public class MemoryManager {
         resources = uc.getResources();
         units = uc.senseUnits();
 
-        uc.write(1, round);
+        uc.write(CURRENT_ROUND, round);
 
-        if (round != 0 && uc.read(0) != uc.read(1)) {
-            uc.write(0, round);
+        if (round != 0 && uc.read(PREVIOUS_ROUND) != uc.read(CURRENT_ROUND)) {
+            uc.write(PREVIOUS_ROUND, round);
             root = true;
         } else {
             root = false;
         }
 
-        if (round == 0 && uc.read(0) == 0) {
-            uc.write(0, round);
+        if (round == 0 && uc.read(PREVIOUS_ROUND) == 0) {
+            uc.write(PREVIOUS_ROUND, round);
             root = true;
         }
-
 
         limitGoldWorkers = uc.read(LIMIT_GOLD_WORKERS);
 
@@ -127,27 +134,27 @@ public class MemoryManager {
         }
 
         if(uc.getType() == UnitType.WORKER) {
-            uc.write(3, uc.read(3) + 1);
+            uc.write(WORKERS_CURRENT, uc.read(WORKERS_CURRENT) + 1);
         }
 
         if(uc.getType() == UnitType.BARRACKS) {
-            uc.write(5, uc.read(5) + 1);
+            uc.write(BARRACKS_CURRENT, uc.read(BARRACKS_CURRENT) + 1);
         }
 
         if(uc.getType() == UnitType.WARRIOR) {
-            uc.write(8, uc.read(8) + 1);
+            uc.write(WARRIORS_CURRENT, uc.read(WARRIORS_CURRENT) + 1);
         }
 
         if(uc.getType() == UnitType.ARCHER) {
-            uc.write(12, uc.read(12) + 1);
+            uc.write(ARCHERS_CURRENT, uc.read(ARCHERS_CURRENT) + 1);
         }
 
         if(uc.getType() == UnitType.KNIGHT) {
-            uc.write(29, uc.read(29) + 1);
+            uc.write(KNIGHTS_CURRENT, uc.read(KNIGHTS_CURRENT) + 1);
         }
 
         if(uc.getType() == UnitType.BALLISTA) {
-            uc.write(32, uc.read(32) + 1);
+            uc.write(BALLISTAS_CURRENT, uc.read(BALLISTAS_CURRENT) + 1);
         }
 
         // Update unique enemies
@@ -165,27 +172,27 @@ public class MemoryManager {
     }
 
     public int getWorkersNum() {
-        return uc.read(2);
+        return uc.read(WORKERS_PREVIOUS);
     }
 
     public int getBarracksNum() {
-        return uc.read(4) + getBarracksConsNum();
+        return uc.read(BARRACKS_PREVIOUS) + getBarracksConsNum();
     }
 
     public int getWarriorsNum() {
-        return uc.read(7) + uc.read(9);
+        return uc.read(WARRIORS_PREVIOUS) + uc.read(WARRIORS_CONSTRUCTION);
     }
 
     public int getArchersNum() {
-        return uc.read(11) + uc.read(13);
+        return uc.read(ARCHERS_PREVIOUS) + uc.read(ARCHERS_CONSTRUCTION);
     }
 
     public int getKnightsNum() {
-        return uc.read(28) + uc.read(30);
+        return uc.read(KNIGHTS_PREVIOUS) + uc.read(KNIGHTS_CONSTRUCTION);
     }
 
     public int getBallistasNum() {
-        return uc.read(31) + uc.read(33);
+        return uc.read(BALLISTAS_PREVIOUS) + uc.read(BALLISTAS_CONSTRUCTION);
     }
 
     public int getTotalTroops() {
@@ -193,7 +200,7 @@ public class MemoryManager {
     }
 
     public int getBarracksConsNum() {
-        return uc.read(6);
+        return uc.read(BARRACKS_CONSTRUCTION);
     }
 
     public int getEnemiesSeenLastRound() {
@@ -219,28 +226,28 @@ public class MemoryManager {
 
     private void rootUpdate() {
         // Updates workers
-        uc.write(2, uc.read(3));
-        uc.write(3, 0);
+        uc.write(WORKERS_PREVIOUS, uc.read(WORKERS_CURRENT));
+        uc.write(WORKERS_CURRENT, 0);
 
         // Updates barracks
-        uc.write(4, uc.read(5));
-        uc.write(5, 0);
+        uc.write(BARRACKS_PREVIOUS, uc.read(BARRACKS_CURRENT));
+        uc.write(BARRACKS_CURRENT, 0);
 
         // Updates warriors
-        uc.write(7, uc.read(8));
-        uc.write(8, 0);
+        uc.write(WARRIORS_PREVIOUS, uc.read(WARRIORS_CURRENT));
+        uc.write(WARRIORS_CURRENT, 0);
 
         // Updates archers
-        uc.write(11, uc.read(12));
-        uc.write(12, 0);
+        uc.write(ARCHERS_PREVIOUS, uc.read(ARCHERS_CURRENT));
+        uc.write(ARCHERS_CURRENT, 0);
 
         // Updates knights
-        uc.write(28, uc.read(29));
-        uc.write(29, 0);
+        uc.write(KNIGHTS_PREVIOUS, uc.read(KNIGHTS_CURRENT));
+        uc.write(KNIGHTS_CURRENT, 0);
 
         // Updates ballistas
-        uc.write(31, uc.read(32));
-        uc.write(32, 0);
+        uc.write(BALLISTAS_PREVIOUS, uc.read(BALLISTAS_CURRENT));
+        uc.write(BALLISTAS_CURRENT, 0);
 
         // Update enemies
         boolean foundID = false;
@@ -263,8 +270,8 @@ public class MemoryManager {
 
         uc.write(AT_LEAST_ONE_ENEMY, 0);
 
-        uc.write(20, 0);
-        uc.write(21, 1);
+        uc.write(OAKS, 0);
+        uc.write(NOT_FULL, 1);
 
         if (uc.read(ENEMY_BASES) == 0) {
             uc.write(ENEMY_BASES, startEnemies.length);
@@ -280,7 +287,7 @@ public class MemoryManager {
         for (int i = 60; i < 100; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 25) {
-                    uc.write(6, uc.read(6) - 1);
+                    uc.write(BARRACKS_CONSTRUCTION, uc.read(BARRACKS_CONSTRUCTION) - 1);
                     uc.write(i, 0);
                     uc.write(i + 1, 0);
                 }
@@ -292,7 +299,7 @@ public class MemoryManager {
         for (int i = 100; i < 200; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
-                    uc.write(9, uc.read(9) - 1);
+                    uc.write(WARRIORS_CONSTRUCTION, uc.read(WARRIORS_CONSTRUCTION) - 1);
                     uc.write(i, 0);
                     uc.write(i + 1, 0);
                 }
@@ -304,7 +311,7 @@ public class MemoryManager {
         for (int i = 200; i < 300; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
-                    uc.write(13, uc.read(13) - 1);
+                    uc.write(ARCHERS_CONSTRUCTION, uc.read(ARCHERS_CONSTRUCTION) - 1);
                     uc.write(i, 0);
                     uc.write(i + 1, 0);
                 }
@@ -316,7 +323,7 @@ public class MemoryManager {
         for (int i = 300; i < 400; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
-                    uc.write(30, uc.read(30) - 1);
+                    uc.write(KNIGHTS_CONSTRUCTION, uc.read(KNIGHTS_CONSTRUCTION) - 1);
                     uc.write(i, 0);
                     uc.write(i + 1, 0);
                 }
@@ -328,7 +335,7 @@ public class MemoryManager {
         for (int i = 400; i < 500; i = i + 2) {
             if (uc.read(i) != 0) {
                 if (uc.read(i + 1) == 5) {
-                    uc.write(33, uc.read(33) - 1);
+                    uc.write(BALLISTAS_CONSTRUCTION, uc.read(BALLISTAS_CONSTRUCTION) - 1);
                     uc.write(i, 0);
                     uc.write(i + 1, 0);
                 }

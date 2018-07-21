@@ -57,10 +57,10 @@ public class Collect {
         senseSmalls();
         countWorkers();
         if (numOaks > (workerCount + 1) * 1.6 && oakHealth / ((workerCount + 1) * 4) > 250) {
-            uc.write(20, 1);
+            uc.write(manager.OAKS, 1);
         }
         if (unaccessible + numAdjacentTrees < 7) {
-            uc.write(21, 0);
+            uc.write(manager.NOT_FULL, 0);
         }
         spawnIfNeeded(numAdjacentTrees);
         plantIfNeeded();
@@ -151,7 +151,7 @@ public class Collect {
         uc.spawn(dir, UnitType.BARRACKS);
 
         // Updates barracks in construction
-        uc.write(6, uc.read(6) + 1);
+        uc.write(manager.BARRACKS_CONSTRUCTION, uc.read(manager.BARRACKS_CONSTRUCTION) + 1);
         for (int i = 60; i < 100; i = i + 2) {
             if (uc.read(i) == 0) {
                 uc.write(i, uc.senseUnit(myLocation.add(dir)).getID());
@@ -210,9 +210,6 @@ public class Collect {
             }
 
             for (int i = 0; i < trees.length; i++) {
-                if (uc.getEnergyLeft() < 6000) {
-                    break;
-                }
                 TreeInfo currentTree = trees[i];
                 int distance = locs[j].distanceSquared(currentTree.location);
                 if (currentTree.oak && distance != 0) {
@@ -265,6 +262,5 @@ public class Collect {
             }
         }
         return bestLocation;
-
     }
 }

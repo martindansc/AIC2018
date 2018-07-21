@@ -34,19 +34,19 @@ public class Attack {
 
         /*
         // choose one base as objective (can be implemented for when no enemies are seen)
-        if (uc.read(22) == 0) {
+        if (uc.read(manager.CLEARED1) == 0) {
             target = manager.startEnemies[0];
-        } else if (uc.read(23) == 0) {
+        } else if (uc.read(manager.CLEARED2) == 0) {
             target = manager.startEnemies[1];
-        } else if (uc.read(24) == 0) {
+        } else if (uc.read(manager.CLEARED3) == 0) {
             target = manager.startEnemies[2];
         }
         */
 
-        Location newTarget = new Location(uc.read(26), uc.read(27));
+        Location newTarget = new Location(uc.read(manager.ENEMY_XLOC), uc.read(manager.ENEMY_YLOC));
 
-        if ((myLocation.isEqual(newTarget) && uc.read(15) == 0) || uc.read(34) == 1) {
-            uc.write(34, 1);
+        if ((myLocation.isEqual(newTarget) && uc.read(manager.ENEMY_ID) == 0) || uc.read(manager.RETARGET) == 1) {
+            uc.write(manager.RETARGET, 1);
             target = null;
         } else {
             target = newTarget;
@@ -55,21 +55,21 @@ public class Attack {
         for (int i = 0; i < manager.startEnemies.length; i++) {
             if (myLocation.isEqual(manager.startEnemies[i]) && manager.enemies.length == 0) {
                 if (i == 0) {
-                    uc.write(22,1);
+                    uc.write(manager.CLEARED1,1);
                 } else if (i == 1) {
-                    uc.write(23,1);
+                    uc.write(manager.CLEARED2,1);
                 } else if (i == 2) {
-                    uc.write(24,1);
+                    uc.write(manager.CLEARED3,1);
                 }
             }
         }
 
-        if (uc.read(15) == 0) {
+        if (uc.read(manager.ENEMY_ID) == 0) {
             if (manager.enemies.length != 0) {
-                uc.write(15, manager.enemies[0].getID());
-                uc.write(26, manager.enemies[0].getLocation().x);
-                uc.write(27, manager.enemies[0].getLocation().y);
-                uc.write(34, 0);
+                uc.write(manager.ENEMY_ID, manager.enemies[0].getID());
+                uc.write(manager.ENEMY_XLOC, manager.enemies[0].getLocation().x);
+                uc.write(manager.ENEMY_YLOC, manager.enemies[0].getLocation().y);
+                uc.write(manager.RETARGET, 0);
             }
         }
 
@@ -215,6 +215,10 @@ public class Attack {
 
         UnitInfo enemy = enemies[0];
         int maxHealth = 10001;
+
+        if (manager.type == UnitType.WARRIOR && passive) {
+            Location myMoves[] = utils.getPosibleMoves(uc);
+        }
 
         for (UnitInfo unit : enemies){
             int enemyHealth = unit.getHealth();
