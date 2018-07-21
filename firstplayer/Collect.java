@@ -17,121 +17,198 @@ public class Collect {
     private Location myLocation;
     private Location locs[];
     private int resources;
+    private UnitInfo[] units;
+    private TreeInfo[] trees;
+
+    private int numAdjacentTrees = 0;
+    private int numOaks = 0;
+    private int numSmalls = 0;
+    private int workerCount = 0;
+    private boolean attackedThisTurn = false;
 
     public void play() {
 
-        round = uc.getRound();
-        myLocation = uc.getLocation();
+        attackedThisTurn = false;
+        numAdjacentTrees = 0;
+        numOaks = 0;
+        numSmalls = 0;
+        workerCount = 0;
+
+        round = manager.round;
+        myLocation = manager.myLocation;
         locs = utils.getLocations(uc, myLocation);
-        resources = uc.getResources();
+        units = uc.senseUnits();
+        trees = manager.trees;
 
         tryToHarvest();
         move();
-        int numAdjacentTrees = tryToHarvest();
+
+        if (!attackedThisTurn) {
+            tryToHarvest();
+        }
+
+        manager.resources = uc.getResources();
+        resources = manager.resources;
+
+        countTrees();
+        senseOaks();
+        senseSmalls();
+        spawnIfNeeded(numAdjacentTrees);
         plantIfNeeded();
-        spwanIffNeeded(numAdjacentTrees);
     }
 
-    public void move() {
+    public Location move() {
         Location newLoc = evalLocation(uc, myLocation);
         if (newLoc != myLocation) {
             uc.move(myLocation.directionTo(newLoc));
+            myLocation = newLoc;
+            locs = utils.getLocations(uc, myLocation);
+            manager.units = uc.senseUnits();
+            manager.trees = uc.senseTrees();
+        }
+
+        return newLoc;
+    }
+
+    public void countTrees() {
+        for (int i = 0; i < locs.length; i++) {
+            TreeInfo newTree = uc.senseTree(locs[i]);
+            if (newTree != null) {
+                numAdjacentTrees++;
+            }
         }
     }
 
-    public int tryToHarvest() {
-        int treeCount = 0;
+    public void senseOaks() {
+        for (int i = 0; i < trees.length; i++) {
+            boolean water = utils.isObstructedWater(uc, myLocation, trees[i].location);
+            if (water) {
+                break;
+            }
+            if (trees[i].oak == true && !water) {
+                numOaks++;
+            }
+        }
+    }
+
+    public void senseSmalls() {
+        for (int i = 0; i < trees.length; i++) {
+            if (trees[i].oak == false) {
+                numSmalls++;
+            }
+        }
+    }
+
+    public void tryToHarvest() {
         for (int i = 0; i < locs.length; i++) {
             TreeInfo newTree = uc.senseTree(locs[i]);
             UnitInfo newUnit = uc.senseUnit(locs[i]);
-            if (newTree != null || !uc.isAccessible(locs[i])) {
-                treeCount++;
-            }
             if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
                 if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == manager.opponent)) {
                     uc.attack(newTree);
-                }
-            }
-        }
-
-        return treeCount;
-    }
-
-    public void plantIfNeeded() {
-        for (int i = 0; i < locs.length; i++) {
-            if (uc.canUseActiveAbility(locs[i]) && ((round < 100) || (resources > 699 && round > 99))) {
-                uc.useActiveAbility(locs[i]);
-            }
-        }
-    }
-
-    public void spwanIffNeeded(int treeCount) {
-        UnitInfo[] units = uc.senseUnits();
-        for (int i = 0; i < locs.length; i++) {
-            int workerCount = 0;
-            for (int j = 0; j < units.length; j++) {
-                if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
-                    workerCount++;
-                }
-                if (units[j].getTeam() == manager.opponent) {
-                    for (int k = 0; k < 8; ++k) {
-                        if (uc.canSpawn(manager.dirs[i], UnitType.BARRACKS)){
-                            uc.spawn(manager.dirs[i], UnitType.BARRACKS);
-                        }
-                    }
-                }
-            }
-            if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
-                if ((treeCount >= 6 && workerCount < 4) && ((resources > 199 && round < 100) || (resources > 699 && round > 99))) {
-                    uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
+                    attackedThisTurn = true;
                     break;
                 }
             }
         }
     }
 
+    public void plantIfNeeded() {
+        for (int i = 0; i < locs.length; i++) {
+            if (uc.canUseActiveAbility(locs[i]) && utils.canPlantTree(manager) && (workerCount + 1 >= numOaks || numAdjacentTrees < 3)) {
+                uc.useActiveAbility(locs[i]);
+            }
+        }
+    }
+
+    public void spawnIfNeeded(int treeCount) {
+
+        for (int j = 0; j < units.length; j++) {
+            if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
+                workerCount++;
+            }
+            if (units[j].getTeam() == manager.opponent && utils.canSpawnBarraks(manager) && manager.getBarracksNum() < 5) {
+                for (int k = 0; k < 8; k++) {
+                    if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
+                        uc.spawn(manager.dirs[k], UnitType.BARRACKS);
+
+                        // Updates barracks in construction
+                        uc.write(6, uc.read(6) + 1);
+                        for (int i = 20; i < 40; i = i + 2) {
+                            if (uc.read(i) == 0) {
+                                uc.write(i, uc.senseUnit(myLocation.add(manager.dirs[k])).getID());
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > workerCount + 1))
+                && utils.canSpawnWorker(manager)) {
+            for (int i = 0; i < locs.length; i++) {
+                if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
+                        uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
+                        break;
+                }
+            }
+        }
+    }
+
+
     public Location evalLocation(UnitController uc, Location loc) {
 
         Location locs[] = utils.getPosibleMoves(uc);
-        TreeInfo[] trees = uc.senseTrees();
-        UnitInfo[] units = uc.senseUnits();
         VictoryPointsInfo[] points = uc.senseVPs();
-        Team allies = uc.getTeam();
+        Team allies = manager.allies;
 
-        float highestValue = -100000;
+        float highestValue = Integer.MIN_VALUE;
         Location bestLocation = loc;
 
         for (int j = 0; j < locs.length; j++) {
-            float value = 0;
+            int value = 0;
+
+            if(!attackedThisTurn && locs[j].isEqual(myLocation)) {
+                value -= 50000;
+            }
+
             if (utils.isExtreme(uc, locs[j])) {
-                value -= 250;
+                value -= 50000;
             }
 
             if (utils.isWater(uc, locs[j])) {
-                value -= 100;
+                value -= 10000;
             }
 
             for (int i = 0; i < trees.length; i++) {
                 TreeInfo currentTree = trees[i];
-                float distance = locs[j].distanceSquared(currentTree.getLocation());
-                if (currentTree.isOak() && distance != 0) {
-                    value += 200 / (100 + distance);
+                int distance = locs[j].distanceSquared(currentTree.location);
+                if (currentTree.oak && distance != 0) {
+                    value += 32000 / (distance * distance);
                 } else if (distance != 0) {
-                    value += 400 / (100 + distance);
+                    value += 2000 / (distance * distance);
                 }
             }
 
+
             for (int i = 0; i < units.length; i++) {
                 UnitInfo currentUnit = units[i];
-                float distance = locs[j].distanceSquared(currentUnit.getLocation());
+                int distance = locs[j].distanceSquared(currentUnit.getLocation());
                 Team unitTeam = currentUnit.getTeam();
                 UnitType unitType = currentUnit.getType();
 
                 if (unitTeam == allies && unitType == UnitType.WORKER) {
                     if (distance <= 2) {
-                        value -= 10;
-                    } else if (distance < 10) {
-                        value -= 2;
+                        value -= 10000;
+                    }
+                    else if (distance < 10) {
+                        value -= 2000;
+                    }
+                    
+                    if(!attackedThisTurn) {
+                        value -= 5000;
                     }
                 }
 
@@ -142,8 +219,14 @@ public class Collect {
 
             for (int i = 0; i < points.length; i++) {
                 VictoryPointsInfo currentVP = points[i];
-                float distance = locs[j].distanceSquared(currentVP.getLocation());
-                value += 2 / (1 + distance);
+                int distance = locs[j].distanceSquared(currentVP.getLocation());
+                if(distance != 0) {
+                    value += 200 / (1 + distance);
+                }
+                else {
+                    value -= 200;
+                }
+
             }
 
             if (highestValue < value) {

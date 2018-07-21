@@ -55,14 +55,15 @@ public class Collect {
         countTrees();
         senseOaks();
         senseSmalls();
-        spawnIfNeeded(numAdjacentTrees);
-        plantIfNeeded();
-        if (numOaks > 3 && oakHealth > 1000) {
+        countWorkers();
+        if (numOaks > (workerCount + 1) * 1.6 && oakHealth / ((workerCount + 1) * 4) > 250) {
             uc.write(20, 1);
         }
         if (unaccessible + numAdjacentTrees < 7) {
             uc.write(21, 0);
         }
+        spawnIfNeeded(numAdjacentTrees);
+        plantIfNeeded();
     }
 
     public Location move() {
@@ -114,6 +115,14 @@ public class Collect {
         }
     }
 
+    public void countWorkers() {
+        for (int j = 0; j < units.length; j++) {
+            if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
+                workerCount++;
+            }
+        }
+    }
+
     public void tryToHarvest() {
         for (int i = 0; i < locs.length; i++) {
             TreeInfo newTree = uc.senseTree(locs[i]);
@@ -154,9 +163,6 @@ public class Collect {
     public void spawnIfNeeded(int treeCount) {
 
         for (int j = 0; j < units.length; j++) {
-            if (units[j].getType() == UnitType.WORKER && units[j].getTeam() == manager.allies) {
-                workerCount++;
-            }
             if (utils.canSpawnBarracks(units[j], manager)) {
                 for (int k = 0; k < 8; k++) {
                     if (uc.canSpawn(manager.dirs[k], UnitType.BARRACKS)){
@@ -167,7 +173,7 @@ public class Collect {
             }
         }
 
-        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.6))
+        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.6 && oakHealth / ((workerCount + 1) * 4) > 250))
                 && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {

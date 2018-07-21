@@ -32,8 +32,8 @@ public class Attack {
             aggressive = false;
         }
 
-        // choose one objective
         /*
+        // choose one base as objective (can be implemented for when no enemies are seen)
         if (uc.read(22) == 0) {
             target = manager.startEnemies[0];
         } else if (uc.read(23) == 0) {
@@ -44,7 +44,13 @@ public class Attack {
         */
 
         Location newTarget = new Location(uc.read(26), uc.read(27));
-        target = newTarget;
+
+        if ((myLocation.isEqual(newTarget) && uc.read(15) == 0) || uc.read(34) == 1) {
+            uc.write(34, 1);
+            target = null;
+        } else {
+            target = newTarget;
+        }
 
         for (int i = 0; i < manager.startEnemies.length; i++) {
             if (myLocation.isEqual(manager.startEnemies[i]) && manager.enemies.length == 0) {
@@ -58,19 +64,12 @@ public class Attack {
             }
         }
 
-        /*
-        if (myLocation.isEqual(target) && manager.enemies.length == 0) {
-            uc.write(26,0);
-            uc.write(27,0);
-        }
-        */
-
-        // TODO improve retargetting somehow
         if (uc.read(15) == 0) {
             if (manager.enemies.length != 0) {
                 uc.write(15, manager.enemies[0].getID());
                 uc.write(26, manager.enemies[0].getLocation().x);
                 uc.write(27, manager.enemies[0].getLocation().y);
+                uc.write(34, 0);
             }
         }
 
@@ -169,6 +168,48 @@ public class Attack {
     }
 
     public boolean tryAttackBestUnit() {
+        int myLevel = uc.getLevel();
+        int myAttack = 0;
+        int warriorPassive = 0;
+        boolean passive = false;
+        boolean active = false;
+
+        if (myLevel >= 2) {
+            active = true;
+        }
+        if (myLevel >= 1) {
+            passive = true;
+        }
+
+        if (manager.type == UnitType.WARRIOR) {
+            if (myLevel == 3) {
+                myAttack = GameConstants.WARRIOR_ATTACK_LEVEL3;
+            } else {
+                myAttack = GameConstants.WARRIOR_ATTACK;
+            }
+            if (passive) {
+                warriorPassive = 2 * myAttack;
+            }
+        } else if (manager.type == UnitType.ARCHER) {
+            if (myLevel == 3) {
+                myAttack = GameConstants.ARCHER_ATTACK_LEVEL3;
+            } else {
+                myAttack = GameConstants.ARCHER_ATTACK;
+            }
+        } else if (manager.type == UnitType.KNIGHT) {
+            if (myLevel == 3) {
+                myAttack = GameConstants.KNIGHT_ATTACK_LEVEL3;
+            } else {
+                myAttack = GameConstants.KNIGHT_ATTACK;
+            }
+        } else if (manager.type == UnitType.BALLISTA) {
+            if (myLevel == 3) {
+                myAttack = GameConstants.BALLISTA_ATTACK_LEVEL3;
+            } else {
+                myAttack = GameConstants.BALLISTA_ATTACK;
+            }
+        }
+
         UnitInfo[] enemies = manager.enemies;
         if(enemies.length == 0 || !uc.canAttack()) return false;
 
@@ -187,7 +228,6 @@ public class Attack {
             uc.attack(enemy);
             return true;
         }
-
         return false;
     }
 

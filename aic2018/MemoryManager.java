@@ -28,6 +28,8 @@ public class MemoryManager {
     private int ENEMY_XLOC = 26;
     private int ENEMY_YLOC = 27;
 
+    private int RETARGET = 34;
+
     public UnitController uc;
 
     public boolean root;
@@ -45,6 +47,7 @@ public class MemoryManager {
     public UnitInfo[] enemies;
     public TreeInfo[] trees;
     public Location myLocation;
+    public UnitType type;
 
     public int limitGoldWorkers = 0;
 
@@ -63,6 +66,7 @@ public class MemoryManager {
         dirs = Direction.values();
 
         myLocation = uc.getLocation();
+        type = uc.getType();
 
         distanceBetweenStarters = Integer.MAX_VALUE;
 
@@ -110,11 +114,16 @@ public class MemoryManager {
 
         if(enemies.length > 0) {
             uc.write(AT_LEAST_ONE_ENEMY, 1);
-            if (uc.read(ENEMY_XLOC) == 0 && uc.read(ENEMY_YLOC) == 0) {
+            if (uc.read(ENEMY_ID) == 0) {
                 uc.write(ENEMY_XLOC, enemies[0].getLocation().x);
                 uc.write(ENEMY_YLOC, enemies[0].getLocation().y);
                 uc.write(ENEMY_ID, enemies[0].getID());
+                uc.write(RETARGET, 0);
             }
+        }
+
+        if (uc.read(AT_LEAST_ONE_ENEMY) == 1) {
+            roundBarracks = round;
         }
 
         if(uc.getType() == UnitType.WORKER) {
@@ -250,10 +259,7 @@ public class MemoryManager {
         }
         if (!foundID) {
             uc.write(ENEMY_ID, 0);
-            uc.write(ENEMY_XLOC, 0);
-            uc.write(ENEMY_YLOC, 0);
         }
-
 
         uc.write(AT_LEAST_ONE_ENEMY, 0);
 
