@@ -1,4 +1,4 @@
-package workers;
+package aic2018;
 
 import aic2018.*;
 
@@ -385,6 +385,17 @@ public class MemoryManager {
             objective = UnitType.WORKER;
         } else {
             objective = UnitType.WARRIOR;
+        }
+    }
+
+    public void setEnemyTarget(boolean priority) {
+        if (uc.read(ENEMY_ID) == 0 || priority) {
+            if (enemies.length > 0) {
+                uc.write(ENEMY_ID, enemies[0].getID());
+                uc.write(ENEMY_XLOC, enemies[0].getLocation().x);
+                uc.write(ENEMY_YLOC, enemies[0].getLocation().y);
+                uc.write(RETARGET, 0);
+            }
         }
     }
 

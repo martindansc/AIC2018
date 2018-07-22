@@ -1,4 +1,4 @@
-package workers;
+package aic2018;
 
 import aic2018.Direction;
 import aic2018.Location;

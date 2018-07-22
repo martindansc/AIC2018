@@ -1,4 +1,4 @@
-package workers;
+package aic2018;
 
 import aic2018.*;
 
@@ -69,14 +69,7 @@ public class Attack {
             }
         }
 
-        if (uc.read(manager.ENEMY_ID) == 0) {
-            if (manager.enemies.length != 0) {
-                uc.write(manager.ENEMY_ID, manager.enemies[0].getID());
-                uc.write(manager.ENEMY_XLOC, manager.enemies[0].getLocation().x);
-                uc.write(manager.ENEMY_YLOC, manager.enemies[0].getLocation().y);
-                uc.write(manager.RETARGET, 0);
-            }
-        }
+        manager.setEnemyTarget(false);
 
         tryAttackBestUnit();
         move();

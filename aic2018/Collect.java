@@ -1,4 +1,4 @@
-package workers;
+package aic2018;
 
 import aic2018.*;
 
@@ -45,6 +45,7 @@ public class Collect {
         trees = manager.trees;
 
         tryToHarvest();
+        //manager.setEnemyTarget(true);
         move();
 
         manager.resources = uc.getResources();
