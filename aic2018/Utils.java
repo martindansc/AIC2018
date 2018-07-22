@@ -153,7 +153,8 @@ public class Utils {
     public Boolean canPlantTree(MemoryManager manager) {
         return(((manager.round < manager.getBarracksRound() && manager.resources > 220) ||
                 (manager.resources > 699 && manager.round >= manager.getBarracksRound()))
-                && manager.objective == UnitType.WORKER);
+                &&  manager.objective == UnitType.WORKER &&
+                manager.myLocation.distanceSquared(manager.closestStarterEnemey) > manager.distanceBetweenStarters*0.6);
     }
 
     public Boolean canSpawnWorker(MemoryManager manager) {

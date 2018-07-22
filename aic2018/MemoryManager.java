@@ -49,7 +49,7 @@ public class MemoryManager {
     public Direction[] dirs;
     public Location[] startEnemies;
 
-    public Location starter;
+    public Location[] starters;
 
     public int round;
     public int resources;
@@ -61,7 +61,8 @@ public class MemoryManager {
 
     public int limitGoldWorkers = 0;
 
-    int distanceBetweenStarters;
+    public int distanceBetweenStarters;
+    public Location closestStarterEnemey;
 
     UnitType objective;
 
@@ -80,13 +81,16 @@ public class MemoryManager {
 
         distanceBetweenStarters = Integer.MAX_VALUE;
 
-        starter = allies.getInitialLocations()[0];
+        starters = allies.getInitialLocations();
 
         startEnemies = uc.getTeam().getOpponent().getInitialLocations();
-        for(Location startEnemy : startEnemies) {
-            int distance = starter.distanceSquared(startEnemy);
-            if(distanceBetweenStarters > distance) {
-                distanceBetweenStarters = distance;
+        for(Location starter : starters) {
+            for (Location startEnemy : startEnemies) {
+                int distance = starter.distanceSquared(startEnemy);
+                if (distanceBetweenStarters > distance) {
+                    distanceBetweenStarters = distance;
+                    closestStarterEnemey = startEnemy;
+                }
             }
         }
 
