@@ -20,7 +20,7 @@ public class Barracks {
 
         myLocation = manager.myLocation;
         int totalTroops = manager.getTotalTroops();
-        if (totalTroops < manager.getEnemiesSeenLastRound() * 5) {
+        if (totalTroops < manager.getEnemiesSeenLastRound() * 100) {
             for (int i = 0; i < 8; ++i) {
                 if (uc.canSpawn(manager.dirs[i], manager.objective)) {
                     uc.spawn(manager.dirs[i], manager.objective);
