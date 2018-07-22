@@ -63,11 +63,10 @@ public class MemoryManager {
 
     public int distanceBetweenStarters;
     public Location closestStarterEnemey;
-    public int forceBarracksRound;
 
     UnitType objective;
 
-    int roundBarracks = 100;
+    int roundBarracks = 70;
 
     public MemoryManager(UnitController uc) {
         this.uc = uc;
