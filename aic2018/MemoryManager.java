@@ -373,19 +373,10 @@ public class MemoryManager {
     }
 
     public void decideNextUnitType() {
-        int totalTroops = getTotalTroops() + 1;
-        int warriors = getWarriorsNum();
-
-        // from offensive to farms
-        if(totalTroops > getEnemiesSeenLastRound() * 5 || getWorkersNum() < 4) {
+        if(getTotalTroops() > getEnemiesSeenLastRound() * 5) {
             objective = UnitType.WORKER;
-        } else if (warriors < 10) {
-            objective = UnitType.WARRIOR;
         } else {
-            if (totalTroops > 25 && getBallistasNum() < 1) objective = UnitType.BALLISTA;
-            else if (warriors * 15 / totalTroops <= 5) objective = UnitType.WARRIOR;
-            else if (getArchersNum() * 10 / totalTroops <= 2) objective = UnitType.ARCHER;
-            else if (getKnightsNum() * 10 / totalTroops <= 2) objective = UnitType.KNIGHT;
+            objective = UnitType.WARRIOR;
         }
     }
 
