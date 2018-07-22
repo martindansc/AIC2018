@@ -44,7 +44,6 @@ public class Collect {
 
         tryToHarvest();
         move();
-        tryToHarvest();
 
         manager.resources = uc.getResources();
         resources = manager.resources;
@@ -60,6 +59,7 @@ public class Collect {
         }
         spawnIfNeeded(numAdjacentTrees);
         plantIfNeeded();
+        tryToHarvest();
     }
 
     public void move() {
@@ -242,7 +242,7 @@ public class Collect {
                     else if (distance < 10) {
                         value -= 2000;
                     }
-                    
+
                     if(!attackedThisTurn) {
                         value -= 5000;
                     }
