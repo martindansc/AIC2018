@@ -1,4 +1,6 @@
-package aic2018;
+package workers;
+
+import aic2018.*;
 
 public class Attack {
 
@@ -102,7 +104,7 @@ public class Attack {
     public Location evalLocation() {
 
         Location plocs[] = utils.getPosibleMoves(uc);
-        UnitInfo[] units = uc.senseUnits();
+        UnitInfo[] units = manager.units;
         VictoryPointsInfo[] points = uc.senseVPs();
         Team allies = uc.getTeam();
 
@@ -120,23 +122,9 @@ public class Attack {
 
                 if(unitTeam != allies) {
                     if(manager.type == UnitType.ARCHER){
-                        if (unitType == UnitType.BARRACKS) {
-                            value -= 3 / (1 + distance);
-                        } else if (unitType == UnitType.WORKER) {
+                        if (unitType == UnitType.WORKER) {
                             value += 10 / (1 + distance) - currentUnit.getHealth() / 6;
-                        } else if(distance <= GameConstants.ARCHER_ATTACK_RANGE_SQUARED){
-                            value -= 100 / (1 + distance);
-                        }
-                        else {
-                            value += 2;
-                        }
-                    }
-                    else if(manager.type == UnitType.BALLISTA) {
-                        if (unitType == UnitType.BARRACKS) {
-                            value -= 3 / (1 + distance);
-                        } else if (unitType == UnitType.WORKER) {
-                            value += 10 / (1 + distance) - currentUnit.getHealth() / 6;
-                        } else if(distance <= GameConstants.BALLISTA_ATTACK_RANGE_SQUARED){
+                        } else if(distance < GameConstants.ARCHER_ATTACK_RANGE_SQUARED){
                             value -= 100 / (1 + distance);
                         }
                         else {
@@ -242,44 +230,58 @@ public class Attack {
         if (manager.type == UnitType.WARRIOR && passive) {
             for (int i = 0; i < enemies.length; i++) {
                 UnitType enemyType = enemies[i].getType();
-                int health = enemies[i].getHealth();
-                if (uc.canUseActiveAbility() && enemyType != UnitType.BARRACKS && enemyType != UnitType.WORKER) {
-                    if (counter == null) {
-                        counter = enemies[i];
-                        counterType = enemyType;
-                        level = enemies[i].getLevel();
-                    } else if (enemyType == UnitType.KNIGHT && counterType != UnitType.KNIGHT) {
-                        counter = enemies[i];
-                        counterType = enemyType;
-                        level = enemies[i].getLevel();
-                    } else if (enemyType == UnitType.WARRIOR && counterType != UnitType.WARRIOR && counterType != UnitType.KNIGHT) {
-                        counter = enemies[i];
-                        counterType = enemyType;
-                        level = enemies[i].getLevel();
-                    } else if (enemyType == UnitType.ARCHER && counterType == UnitType.BALLISTA) {
-                        counter = enemies[i];
-                        counterType = enemyType;
-                        level = enemies[i].getLevel();
-                    } else if (enemyType == UnitType.BALLISTA && counterType != UnitType.BALLISTA) {
-                        counter = enemies[i];
-                        counterType = enemyType;
-                        level = enemies[i].getLevel();
-                    } else if (enemyType == counterType && level < enemies[i].getLevel()) {
-                        counter = enemies[i];
-                        level = enemies[i].getLevel();
+                Location targetLocation = enemies[i].getLocation();
+                if (enemyType != UnitType.WORKER && uc.canAttack(targetLocation)) {
+                    int health = enemies[i].getHealth();
+                    if (uc.canUseActiveAbility() && enemyType != UnitType.BARRACKS && enemyType != UnitType.WORKER) {
+                        if (counter == null) {
+                            counter = enemies[i];
+                            counterType = enemyType;
+                            level = enemies[i].getLevel();
+                        } else if (enemyType == UnitType.KNIGHT && counterType != UnitType.KNIGHT) {
+                            counter = enemies[i];
+                            counterType = enemyType;
+                            level = enemies[i].getLevel();
+                        } else if (enemyType == UnitType.WARRIOR && counterType != UnitType.WARRIOR && counterType != UnitType.KNIGHT) {
+                            counter = enemies[i];
+                            counterType = enemyType;
+                            level = enemies[i].getLevel();
+                        } else if (enemyType == UnitType.ARCHER && counterType == UnitType.BALLISTA) {
+                            counter = enemies[i];
+                            counterType = enemyType;
+                            level = enemies[i].getLevel();
+                        } else if (enemyType == UnitType.BALLISTA && counterType != UnitType.BALLISTA) {
+                            counter = enemies[i];
+                            counterType = enemyType;
+                            level = enemies[i].getLevel();
+                        } else if (enemyType == counterType && level < enemies[i].getLevel()) {
+                            counter = enemies[i];
+                            level = enemies[i].getLevel();
+                        }
                     }
-                }
-                if (myLocation.distanceSquared(enemies[i].getLocation()) <= 2) {
-                    if (bestTargetHealth < health) {
-                        bestTarget = enemies[i];
-                        bestTargetHealth = health;
-                    }
-                    if (warriorPassive >= health && killableTargetHealth < health) {
-                        killableTarget = enemies[i];
-                        killableTargetHealth = health;
+                    if (myLocation.distanceSquared(enemies[i].getLocation()) <= 2) {
+                        if (bestTargetHealth < health) {
+                            bestTarget = enemies[i];
+                            bestTargetHealth = health;
+                        }
+                        if (warriorPassive >= health && killableTargetHealth < health) {
+                            killableTarget = enemies[i];
+                            killableTargetHealth = health;
+                        }
                     }
                 }
             }
+
+            if (bestTarget == null) {
+                for (int i = 0; i < enemies.length; i++) {
+                    Location targetLocation = enemies[i].getLocation();
+                    if (uc.canAttack(targetLocation)) {
+                        uc.attack(targetLocation);
+                        return true;
+                    }
+                }
+            }
+
             if (killableTarget != null) {
                 uc.attack(killableTarget);
                 return true;
@@ -289,20 +291,43 @@ public class Attack {
             }
         }
 
-        UnitInfo enemy = enemies[0];
-        int maxHealth = 10001;
-
-        for (UnitInfo unit : enemies){
-            int enemyHealth = unit.getHealth();
-            if (maxHealth > enemyHealth && uc.canAttack(unit)) {
-                maxHealth = enemyHealth;
-                enemy = unit;
+        else {
+            for (int i = 0; i < enemies.length; i++) {
+                UnitType enemyType = enemies[i].getType();
+                Location targetLocation = enemies[i].getLocation();
+                if (enemyType != UnitType.WORKER && uc.canAttack(targetLocation)) {
+                    int health = enemies[i].getHealth();
+                    if (bestTargetHealth < health) {
+                        bestTarget = enemies[i];
+                        bestTargetHealth = health;
+                    }
+                    if (myAttack >= health && killableTargetHealth < health) {
+                        killableTarget = enemies[i];
+                        killableTargetHealth = health;
+                    }
+                }
             }
-        }
-
-        if(maxHealth != 10001) {
-            uc.attack(enemy);
-            return true;
+            if (bestTarget == null) {
+                for (int i = 0; i < enemies.length; i++) {
+                    Location targetLocation = enemies[i].getLocation();
+                    if (uc.canAttack(targetLocation)) {
+                        uc.attack(targetLocation);
+                        return true;
+                    }
+                }
+            }
+            if (killableTarget != null) {
+                uc.attack(killableTarget);
+                return true;
+            } else if (bestTarget != null) {
+                Location bestTargetLocation = bestTarget.getLocation();
+                if (manager.type == UnitType.ARCHER && uc.canUseActiveAbility(bestTargetLocation)) {
+                    uc.useActiveAbility(bestTargetLocation);
+                } else {
+                    uc.attack(bestTarget);
+                    return true;
+                }
+            }
         }
         return false;
     }
