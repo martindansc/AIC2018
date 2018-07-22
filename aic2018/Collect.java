@@ -44,10 +44,7 @@ public class Collect {
 
         tryToHarvest();
         move();
-
-        if (!attackedThisTurn) {
-            tryToHarvest();
-        }
+        tryToHarvest();
 
         manager.resources = uc.getResources();
         resources = manager.resources;
@@ -117,14 +114,16 @@ public class Collect {
     }
 
     public void tryToHarvest() {
-        for (int i = 0; i < locs.length; i++) {
-            TreeInfo newTree = uc.senseTree(locs[i]);
-            UnitInfo newUnit = uc.senseUnit(locs[i]);
-            if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
-                if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == manager.opponent)) {
-                    uc.attack(newTree);
-                    attackedThisTurn = true;
-                    break;
+        if(uc.canAttack()) {
+            for (int i = 0; i < locs.length; i++) {
+                TreeInfo newTree = uc.senseTree(locs[i]);
+                UnitInfo newUnit = uc.senseUnit(locs[i]);
+                if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
+                    if (uc.canAttack(newTree) && (newUnit == null || newUnit.getTeam() == manager.opponent)) {
+                        uc.attack(newTree);
+                        attackedThisTurn = true;
+                        break;
+                    }
                 }
             }
         }
