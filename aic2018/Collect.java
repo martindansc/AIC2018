@@ -135,7 +135,7 @@ public class Collect {
     }
 
     public void plantIfNeeded() {
-        if(utils.canPlantTree(manager)) {
+        if(utils.canPlantTree(manager, numSmalls)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canUseActiveAbility(locs[i]) ) {
                     uc.useActiveAbility(locs[i]);
@@ -187,7 +187,7 @@ public class Collect {
 
     public void spawnIfNeeded(int treeCount) {
         checkForSpawn();
-        if (((treeCount == 8 && workerCount < 4) || (numSmalls > (workerCount + 1) * 6) || (numOaks > (workerCount + 1) * 1.3 && oakHealth / ((workerCount + 1) * 4) > 400)) && utils.canSpawnWorker(manager)) {
+        if (((treeCount > 6 && workerCount < 4) || (numSmalls > (workerCount + 1) * 5) || (numOaks > (workerCount + 1) * 1.3 && oakHealth / ((workerCount + 1) * 4) > 400)) && utils.canSpawnWorker(manager)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canSpawn(myLocation.directionTo(locs[i]), UnitType.WORKER)) {
                     uc.spawn(myLocation.directionTo(locs[i]), UnitType.WORKER);
@@ -242,7 +242,7 @@ public class Collect {
                         value -= 10000;
                     }
                     else if (distance < 10) {
-                        value -= 2000;
+                        value -= 20000/(2 + distance);
                     }
 
                     if(!attackedThisTurn) {

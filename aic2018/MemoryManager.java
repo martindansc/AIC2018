@@ -65,6 +65,7 @@ public class MemoryManager {
 
     public int distanceBetweenStarters;
     public Location closestStarterEnemey;
+    public int forceBarracksRound;
 
     UnitType objective;
 
@@ -88,7 +89,7 @@ public class MemoryManager {
         startEnemies = uc.getTeam().getOpponent().getInitialLocations();
         for(Location starter : starters) {
             for (Location startEnemy : startEnemies) {
-                int distance = starter.distanceSquared(startEnemy);
+                int distance = (int) Math.sqrt(starter.distanceSquared(startEnemy));
                 if (distanceBetweenStarters > distance) {
                     distanceBetweenStarters = distance;
                     closestStarterEnemey = startEnemy;
