@@ -39,6 +39,7 @@ public class MemoryManager {
     public int RETARGET = 34;
     public int WORKER_INACTIVE_PREVIOUS = 35;
     public int WORKER_INACTIVE_CURRENT = 36;
+    public int ID_COUNTER = 37;
 
     public UnitController uc;
 
@@ -172,7 +173,13 @@ public class MemoryManager {
         }
 
         // Update unique enemies
-        for (int i = 0; i < enemies.length; i++) {
+        int length = enemies.length;
+        // Update unique enemies
+        if (enemies.length > 13) {
+            length = 13;
+        }
+
+        for (int i = 0; i < length; i++) {
             for (int j = 1000; j < 1500; j++) {
                 int ID = uc.read(j);
                 if (ID == 0) {
@@ -183,6 +190,7 @@ public class MemoryManager {
                 }
             }
         }
+
     }
 
     public int getWorkersNum() {
@@ -287,6 +295,11 @@ public class MemoryManager {
             }
             if (ID == enemyID) {
                 foundID = true;
+                int IDcounter = uc.read(ID_COUNTER);
+                if (ID_COUNTER == 20) {
+                    uc.write(ENEMY_ID, 0);
+                }
+                uc.write(ID_COUNTER, IDcounter + 1);
             }
         }
         if (!foundID) {
