@@ -133,7 +133,7 @@ public class Collect {
     }
 
     public void plantIfNeeded() {
-        if(utils.canPlantTree(manager)) {
+        if(utils.canPlantTree(manager, numSmalls)) {
             for (int i = 0; i < locs.length; i++) {
                 if (uc.canUseActiveAbility(locs[i]) ) {
                     uc.useActiveAbility(locs[i]);

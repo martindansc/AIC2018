@@ -150,11 +150,11 @@ public class Utils {
         return false;
     }
 
-    public Boolean canPlantTree(MemoryManager manager) {
+    public Boolean canPlantTree(MemoryManager manager, int numSmalls) {
         return(((manager.round < manager.getBarracksRound() && manager.resources > 220) ||
                 (manager.resources > 699 && manager.round >= manager.getBarracksRound()))
                 && (manager.objective == UnitType.WORKER ||
-                manager.getTotalTroops() > manager.getEnemiesSeenLastRound() * 3) &&
+                (manager.getTotalTroops() > manager.getEnemiesSeenLastRound() * 3) && numSmalls < 4) &&
                 Math.sqrt(manager.myLocation.distanceSquared(manager.closestStarterEnemey)) > manager.distanceBetweenStarters*0.4);
     }
 
