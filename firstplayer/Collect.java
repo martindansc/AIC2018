@@ -1,4 +1,6 @@
-package aic2018;
+package firstplayer;
+
+import aic2018.*;
 
 public class Collect {
 
