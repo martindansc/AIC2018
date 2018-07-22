@@ -66,7 +66,7 @@ public class MemoryManager {
 
     UnitType objective;
 
-    int roundBarracks = 70;
+    int roundBarracks;
 
     public MemoryManager(UnitController uc) {
         this.uc = uc;
@@ -95,6 +95,8 @@ public class MemoryManager {
         }
 
         objective = UnitType.WORKER;
+
+        roundBarracks = 60 + (int)(distanceBetweenStarters*1.3);
     }
 
     public void update() {
