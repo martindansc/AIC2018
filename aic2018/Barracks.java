@@ -1,4 +1,6 @@
-package aic2018;
+package workers;
+
+import aic2018.*;
 
 public class Barracks {
 
@@ -19,14 +21,45 @@ public class Barracks {
     public UnitType decideNext() {
         int totalTroops = manager.getTotalTroops() + 1;
         int warriors = manager.getWarriorsNum();
+        int knights = manager.getKnightsNum();
+        int knightCounter = 0;
+        int warriorCouner = 0;
+        int archerCounter = 0;
+        int enemyCounterArcher = 0;
+        int enemyCounterKnight = 0;
+        int enemyCounterWarrior = 0;
+        UnitInfo units[] = manager.units;
+        for (UnitInfo currentUnit : units) {
+            UnitType type = currentUnit.getType();
+            if (currentUnit.getTeam() == manager.allies) {
+                if (type == UnitType.KNIGHT) {
+                    knightCounter++;
+                } else if (type == UnitType.WARRIOR) {
+                    warriorCouner++;
+                } else if (type == UnitType.ARCHER) {
+                    archerCounter++;
+                }
+            } else {
+                if (type == UnitType.KNIGHT) {
+                    enemyCounterKnight++;
+                } else if (type == UnitType.WARRIOR) {
+                    enemyCounterWarrior++;
+                } else if (type == UnitType.ARCHER) {
+                    enemyCounterArcher++;
+                }
+            }
+        }
 
-        UnitType next = UnitType.WARRIOR;
-        if (warriors < 10) {
-            next = UnitType.WARRIOR;
+        UnitType next = UnitType.KNIGHT;
+        if (uc.senseWater(36).length > 20) {
+            next = UnitType.ARCHER;
+        } else if (manager.enemies.length == 0) {
+            next = UnitType.ARCHER;
+        } else if (knightCounter < 6) {
+            next = UnitType.KNIGHT;
         } else {
-            if (warriors * 15 / totalTroops <= 5) next = UnitType.WARRIOR;
-            else if (manager.getArchersNum() * 10 / totalTroops <= 2) next = UnitType.ARCHER;
-            else if (manager.getKnightsNum() * 10 / totalTroops <= 2) next = UnitType.KNIGHT;
+            if (warriorCouner < 10) next = UnitType.WARRIOR;
+            else { next = UnitType.ARCHER;}
         }
         return next;
     }
@@ -41,9 +74,6 @@ public class Barracks {
             UnitType next = decideNext();
 
             for (int i = 0; i < 8; ++i) {
-                if (manager.enemies.length > 0) {
-                    next = UnitType.WARRIOR;
-                }
                 if (uc.canSpawn(manager.dirs[i], next)) {
                     uc.spawn(manager.dirs[i], next);
 
