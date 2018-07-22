@@ -242,6 +242,10 @@ public class Collect {
                     else if (distance < 10) {
                         value -= 2000;
                     }
+
+                    if(!attackedThisTurn) {
+                        value -= 5000;
+                    }
                 }
 
                 if (unitTeam != allies && unitType != UnitType.WORKER) {
