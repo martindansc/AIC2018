@@ -1,0 +1,1 @@
+This bot is part of the 1st Edition AI Coliseum competition, the website is: http://www.coliseum.ai/home. The bot submitted is inside the aic2018 folder. The documentation of the classes and methods can be found here: http://www.coliseum.ai/doc_aic2018/index.html
