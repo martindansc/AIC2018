@@ -152,10 +152,12 @@ public class Utils {
         return false;
     }
 
-    public Boolean canPlantTree(MemoryManager manager) {
+    public Boolean canPlantTree(MemoryManager manager, int numSmalls) {
         return(((manager.round < manager.getBarracksRound() && manager.resources > 220) ||
                 (manager.resources > 699 && manager.round >= manager.getBarracksRound()))
-                && manager.objective == UnitType.WORKER);
+                && (manager.objective == UnitType.WORKER ||
+                (manager.getTotalTroops() > manager.getEnemiesSeenLastRound() * 5) && numSmalls < 4) &&
+                Math.sqrt(manager.myLocation.distanceSquared(manager.closestStarterEnemey)) > manager.distanceBetweenStarters*0.4);
     }
 
     public Boolean canSpawnWorker(MemoryManager manager) {
@@ -175,18 +177,18 @@ public class Utils {
             maxBarracks = 0;
         } else if (numberEnemies == 1) {
             maxBarracks = 1;
-        } else if (numberEnemies < 5) {
+        } else if (numberEnemies < 4) {
             maxBarracks = 2;
-        } else if (numberEnemies < 9) {
+        } else if (numberEnemies < 7) {
             maxBarracks = 3;
         } else {
             double roundCap = Math.sqrt(manager.round) / 2;
             int Cap = (int) roundCap;
-            maxBarracks = numberEnemies / 4;
+            maxBarracks = numberEnemies / 3;
             if (Cap > maxBarracks) {
                 maxBarracks = Cap;
             }
-            if (manager.resources < numberBarracks * 100 + 500) {
+            if (manager.resources < numberBarracks * 30 + 500) {
                 maxBarracks = numberBarracks;
             }
         }

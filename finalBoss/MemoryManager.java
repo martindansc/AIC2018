@@ -41,6 +41,7 @@ public class MemoryManager {
     public int RETARGET = 34;
     public int WORKER_INACTIVE_PREVIOUS = 35;
     public int WORKER_INACTIVE_CURRENT = 36;
+    public int ID_COUNTER = 37;
 
     public UnitController uc;
 
@@ -51,7 +52,7 @@ public class MemoryManager {
     public Direction[] dirs;
     public Location[] startEnemies;
 
-    public Location starter;
+    public Location[] starters;
 
     public int round;
     public int resources;
@@ -63,11 +64,12 @@ public class MemoryManager {
 
     public int limitGoldWorkers = 0;
 
-    int distanceBetweenStarters;
+    public int distanceBetweenStarters;
+    public Location closestStarterEnemey;
 
     UnitType objective;
 
-    int roundBarracks = 100;
+    int roundBarracks;
 
     public MemoryManager(UnitController uc) {
         this.uc = uc;
@@ -82,17 +84,22 @@ public class MemoryManager {
 
         distanceBetweenStarters = Integer.MAX_VALUE;
 
-        starter = allies.getInitialLocations()[0];
+        starters = allies.getInitialLocations();
 
         startEnemies = uc.getTeam().getOpponent().getInitialLocations();
-        for(Location startEnemy : startEnemies) {
-            int distance = starter.distanceSquared(startEnemy);
-            if(distanceBetweenStarters > distance) {
-                distanceBetweenStarters = distance;
+        for(Location starter : starters) {
+            for (Location startEnemy : startEnemies) {
+                int distance = (int) Math.sqrt(starter.distanceSquared(startEnemy));
+                if (distanceBetweenStarters > distance) {
+                    distanceBetweenStarters = distance;
+                    closestStarterEnemey = startEnemy;
+                }
             }
         }
 
         objective = UnitType.WORKER;
+
+        roundBarracks = 60 + (int)(distanceBetweenStarters*1.3);
     }
 
     public void update() {
@@ -168,7 +175,13 @@ public class MemoryManager {
         }
 
         // Update unique enemies
-        for (int i = 0; i < enemies.length; i++) {
+        int length = enemies.length;
+        // Update unique enemies
+        if (enemies.length > 13) {
+            length = 13;
+        }
+
+        for (int i = 0; i < length; i++) {
             for (int j = 1000; j < 1500; j++) {
                 int ID = uc.read(j);
                 if (ID == 0) {
@@ -179,6 +192,7 @@ public class MemoryManager {
                 }
             }
         }
+
     }
 
     public int getWorkersNum() {
@@ -283,6 +297,11 @@ public class MemoryManager {
             }
             if (ID == enemyID) {
                 foundID = true;
+                int IDcounter = uc.read(ID_COUNTER);
+                if (ID_COUNTER == 20) {
+                    uc.write(ENEMY_ID, 0);
+                }
+                uc.write(ID_COUNTER, IDcounter + 1);
             }
         }
         if (!foundID) {
@@ -375,19 +394,10 @@ public class MemoryManager {
     }
 
     public void decideNextUnitType() {
-        int totalTroops = getTotalTroops() + 1;
-        int warriors = getWarriorsNum();
-
-        // from offensive to farms
-        if(totalTroops > getEnemiesSeenLastRound() * 5 || getWorkersNum() < 4) {
+        if(getTotalTroops() > getEnemiesSeenLastRound() * 5) {
             objective = UnitType.WORKER;
-        } else if (warriors < 10) {
-            objective = UnitType.WARRIOR;
         } else {
-            if (totalTroops > 25 && getBallistasNum() < 1) objective = UnitType.BALLISTA;
-            else if (warriors * 15 / totalTroops <= 5) objective = UnitType.WARRIOR;
-            else if (getArchersNum() * 10 / totalTroops <= 2) objective = UnitType.ARCHER;
-            else if (getKnightsNum() * 10 / totalTroops <= 2) objective = UnitType.KNIGHT;
+            objective = UnitType.WARRIOR;
         }
     }
 

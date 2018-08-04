@@ -81,7 +81,9 @@ public class Attack {
         tryAttackBestUnit();
         move();
         tryAttackBestUnit();
-        tryAttackTree();
+        if (manager.enemies.length == 0) {
+            tryAttackTree();
+        }
     }
 
     public void move() {
@@ -146,7 +148,10 @@ public class Attack {
                         }
                     }
                     else {
-                        if (unitType == UnitType.BARRACKS) {
+                        if (manager.type == UnitType.KNIGHT && unitType == UnitType.WARRIOR && distance < 3) {
+                            value -= 1000;
+                        }
+                        else if (unitType == UnitType.BARRACKS) {
                             value += 16 / (1 + distance) - currentUnit.getHealth() / 6;
                         } else if (unitType == UnitType.WORKER) {
                             value += 8 / (1 + distance) - currentUnit.getHealth() / 6;
@@ -235,7 +240,7 @@ public class Attack {
         if(enemies.length == 0 || !uc.canAttack()) return false;
 
         UnitInfo bestTarget = null;
-        int bestTargetHealth = 0;
+        int bestTargetHealth = 10000;
         UnitInfo killableTarget = null;
         int killableTargetHealth = 0;
         UnitInfo counter = null;
@@ -271,40 +276,50 @@ public class Attack {
                         level = enemies[i].getLevel();
                     }
                 }
-                if (myLocation.distanceSquared(enemies[i].getLocation()) <= 2) {
-                    if (bestTargetHealth < health) {
+                Location targetLocation = enemies[i].getLocation();
+                if (myLocation.distanceSquared(targetLocation) <= 2 && uc.canAttack(targetLocation)) {
+                    if (bestTargetHealth > health) {
                         bestTarget = enemies[i];
                         bestTargetHealth = health;
                     }
-                    if (warriorPassive >= health && killableTargetHealth < health) {
+                    if (warriorPassive >= health && killableTargetHealth < health && uc.canAttack(targetLocation)) {
                         killableTarget = enemies[i];
                         killableTargetHealth = health;
                     }
                 }
             }
-            if (killableTarget != null) {
+        } else {
+            for (UnitInfo unit : enemies){
+                int health = unit.getHealth();
+                if (bestTargetHealth > health && uc.canAttack(unit)) {
+                    bestTarget = unit;
+                    bestTargetHealth = health;
+                }
+                if (myAttack >= health && killableTargetHealth < health && uc.canAttack(unit)) {
+                    killableTarget = unit;
+                    killableTargetHealth = health;
+                }
+            }
+        }
+
+        if (killableTarget != null) {
+            Location finalLoc = bestTarget.getLocation();
+            if (manager.type == UnitType.ARCHER && uc.canUseActiveAbility(finalLoc)) {
+                uc.useActiveAbility(finalLoc);
+            }
+            if (uc.canAttack(killableTarget)) {
                 uc.attack(killableTarget);
                 return true;
-            } else if (bestTarget != null) {
+            }
+        } else if (bestTarget != null) {
+            Location finalLoc = bestTarget.getLocation();
+            if (manager.type == UnitType.ARCHER && uc.canUseActiveAbility(finalLoc)) {
+                uc.useActiveAbility(finalLoc);
+            }
+            if (uc.canAttack(bestTarget)) {
                 uc.attack(bestTarget);
                 return true;
             }
-        }
-
-        UnitInfo enemy = enemies[0];
-        int maxHealth = 10001;
-
-        for (UnitInfo unit : enemies){
-            int enemyHealth = unit.getHealth();
-            if (maxHealth > enemyHealth && uc.canAttack(unit)) {
-                maxHealth = enemyHealth;
-                enemy = unit;
-            }
-        }
-
-        if(maxHealth != 10001) {
-            uc.attack(enemy);
-            return true;
         }
         return false;
     }
