@@ -1,7 +1,6 @@
 package finalBoss;
 
-import aic2018.UnitController;
-import aic2018.UnitType;
+import aic2018.*;
 
 public class UnitPlayer {
 

@@ -1,8 +1,6 @@
 package finalBoss;
 
-import aic2018.Direction;
-import aic2018.Location;
-import aic2018.UnitController;
+import aic2018.*;
 
 public class Pathfind {
 
