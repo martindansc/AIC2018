@@ -8,6 +8,8 @@ public class Collect {
     private UnitController uc;
 
     Direction lastDirectionMoved;
+    int numOaks;
+    boolean[] reachableTrees;
 
     public Collect(MemoryManager memoryManager) {
         this.manager = memoryManager;
@@ -19,6 +21,8 @@ public class Collect {
     }
 
     public void play() {
+
+        updateInfo();
         tryToHarvest();
         tryToMove();
         tryToConstructBarrakcs();
@@ -68,8 +72,10 @@ public class Collect {
     }
 
     private void tryToSpawnWorker() {
+        // there are 2 main reasons
+
         for(Direction direction : manager.dirs) {
-            if (manager.trees.length / (manager.units.length  - manager.enemies.length + 1) > 6 && uc.canSpawn(direction, UnitType.WORKER)) {
+            if (manager.trees.length / (manager.units.length  - manager.enemies.length + 1) > 5 && uc.canSpawn(direction, UnitType.WORKER)) {
                 uc.spawn(direction, UnitType.WORKER);
             }
             break;
@@ -90,12 +96,12 @@ public class Collect {
 
     private void filterNonMovableDirections(int[] scores) {
         for(int i = 0; i < 8; i++) {
-            if(!uc.canMove(manager.dirs[i])) scores[i] = -1;
+            if(!uc.canMove(manager.dirs[i])) scores[i] = Integer.MIN_VALUE;
         }
     }
 
     private void moveToBestDirection(int[] scores) {
-        int bestScore = -1;
+        int bestScore = Integer.MIN_VALUE;
         int directionIndex = 0;
 
         for(int i = 0; i < scores.length; i++) {
@@ -105,7 +111,7 @@ public class Collect {
             }
         }
 
-        if(bestScore > -1) {
+        if(bestScore > Integer.MIN_VALUE) {
             uc.move(manager.dirs[directionIndex]);
             lastDirectionMoved = manager.dirs[directionIndex];
             manager.myLocation = uc.getLocation();
@@ -116,10 +122,52 @@ public class Collect {
 
     }
 
+    private void updateInfo() {
+        // get num oaks / small
+        numOaks = 0;
+        reachableTrees = new boolean[manager.trees.length];
+        for(int i = 0; i < manager.trees.length; i++) {
+            TreeInfo tree = manager.trees[i];
+            if(tree.isOak() && manager.waterRaycast.fastRay(manager.myLocation, tree.location)) {
+                numOaks++;
+                reachableTrees[i] = true;
+            }
+            else if(tree.isSmall()){
+                reachableTrees[i] = true;
+            }
+            else {
+                reachableTrees[i] = false;
+            }
+        }
+
+    }
+
+    private void tryToSpawnTree() {
+        if(uc.canUseActiveAbility() && canPlantTree()) {
+
+            int bestScore = Integer.MIN_VALUE;
+            Direction bestDirection = null;
+
+            for(Direction currentDirection : manager.dirs) {
+                int score = getPointsPlantTree(currentDirection);
+                if(score > bestScore) {
+                    bestScore = score;
+                    bestDirection = currentDirection;
+                }
+            }
+
+            if(bestScore > Integer.MIN_VALUE) {
+                Location bestLocation = manager.myLocation.add(bestDirection);
+                uc.useActiveAbility(bestLocation);
+            }
+
+        }
+    }
+
     // ------ HEURISTIC FUNCTIONS -------
 
     private int getPointsPlantTree(Direction direction) {
-        int points = -1;
+        int points = Integer.MIN_VALUE;
 
         Location location = manager.myLocation.add(direction);
         if(uc.canUseActiveAbility(location)) {
@@ -135,36 +183,17 @@ public class Collect {
         return  points;
     }
 
-    private void tryToSpawnTree() {
-        if(uc.canUseActiveAbility() && canPlantTree()) {
-
-            int bestScore = -1;
-            Direction bestDirection = null;
-
-            for(Direction currentDirection : manager.dirs) {
-                int score = getPointsPlantTree(currentDirection);
-                if(score > bestScore) {
-                    bestScore = score;
-                    bestDirection = currentDirection;
-                }
-            }
-
-            if(bestScore > -1) {
-                Location bestLocation = manager.myLocation.add(bestDirection);
-                uc.useActiveAbility(bestLocation);
-            }
-
-        }
-    }
-
     private int getPointsHarvest(TreeInfo newTree, UnitInfo newUnit) {
-        int points = -1;
-        if (newTree != null && newTree.remainingGrowthTurns == 0 && (newTree.oak || newTree.health > 12)) {
+        int points = Integer.MIN_VALUE;
+
+        if (newTree.remainingGrowthTurns > 0) return points;
+
+        if (newTree.oak || newTree.health > 12) {
 
             points = 0;
 
             if (newUnit == null) {
-                points += 100 + Math.max(newTree.health, 100);
+                points += 100 + Math.max(newTree.health, 99);
             }
             else if(newUnit.getTeam() == manager.opponent){
                 points += 200;
@@ -177,6 +206,11 @@ public class Collect {
                 points += 30;
             }
         }
+        else if(newUnit != null && newUnit.getTeam() != manager.allies
+                && newUnit.getType() == UnitType.WORKER) {
+            points = 200;
+        }
+
         return points;
     }
 
@@ -186,19 +220,25 @@ public class Collect {
 
         for(int i = 0; i < maxIter; i++) {
             TreeInfo newTree = trees[i];
+
+            if(!reachableTrees[i]) continue;
+
             double distance = Math.sqrt(newTree.location.distanceSquared(manager.myLocation));
             Direction directionTo = manager.myLocation.directionTo(newTree.location);
 
             if(directionTo != Direction.ZERO) {
-                // add that we will find a tree in this direction
-                scores[directionTo.ordinal()] += 100 / distance;
 
-                // we can rotate right and left the direction and add some
-                Direction directionRight = directionTo.rotateRight();
-                scores[directionRight.ordinal()] += 50 / distance;
+                if(distance >= 2) {
+                    // add that we will find a tree in this direction
+                    scores[directionTo.ordinal()] += 1000 / (5 + distance);
 
-                Direction directionLeft = directionTo.rotateLeft();
-                scores[directionLeft.ordinal()] += 50 / distance;
+                    // we can rotate right and left the direction and add some
+                    Direction directionRight = directionTo.rotateRight();
+                    scores[directionRight.ordinal()] += 800 / (5 + distance);
+
+                    Direction directionLeft = directionTo.rotateLeft();
+                    scores[directionLeft.ordinal()] += 800 / (5 + distance);
+                }
             }
         }
     }
@@ -222,11 +262,11 @@ public class Collect {
 
                     double value = 0;
 
-                    if (distance <= 2) {
+                    if (distance < 2) {
                         value = 1500;
                     }
                     else if (distance < 10) {
-                        value = 10000/(10 + distance);
+                        value = 1000/distance;
                     }
 
                     // add that we will find a tree in this direction

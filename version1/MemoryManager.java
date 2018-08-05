@@ -7,6 +7,7 @@ public class MemoryManager {
     int BARRACKS_ROUND = 0;
 
     public UnitController uc;
+    public Raycast waterRaycast;
 
     public Team opponent;
     public Team allies;
@@ -32,6 +33,7 @@ public class MemoryManager {
         type = uc.getType();
 
         state = new State();
+        waterRaycast = new Raycast(uc, uc::senseWaterAtLocation);
 
         // set initial barracks round
         if(getBarracksRound() == 0) {
